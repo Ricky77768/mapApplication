@@ -19,7 +19,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
         setContentView(R.layout.profile_create_ui);
         getSupportActionBar().hide();
 
-        // TODO: Like/Dislike - Chip/ChipGroup
+        // TODO: Like/Dislike - Chip/ChipGroup, Profile Picture - Select/Take a Picture
 
         // EventListener for Buttons
         Button profile_create_save = findViewById(R.id.profile_create_save);
