@@ -5,12 +5,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,11 +14,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -38,23 +32,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        // Hide the RecycleView first since no search result is called
+        // Hide certain Views
         RecyclerView location_list = findViewById(R.id.location_list);
+        final Button dropdown_settings = findViewById(R.id.dropdown_settings);
+        final Button dropdown_profiles = findViewById(R.id.dropdown_profiles);
         location_list.setVisibility(View.INVISIBLE);
+        dropdown_profiles.setVisibility(View.INVISIBLE);
+        dropdown_settings.setVisibility(View.INVISIBLE);
 
-        // EventLister for FABs
-        FloatingActionButton fab_settings = findViewById(R.id.button_settings);
-        fab_settings.setOnClickListener(new View.OnClickListener() {
+        // TODO: Prevent multiple activities to startup from repeated button clicks
+        // TODO: Disables "Dropdown View" when a click not on buttons is registered
+        dropdown_profiles.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(MapsActivity.this, SettingsActivity.class);
+                Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
                 startActivity(intent);
             }
         });
 
-        FloatingActionButton fab_profile = findViewById(R.id.button_profile);
-        fab_profile.setOnClickListener(new View.OnClickListener() {
+        dropdown_settings.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
+                Intent intent = new Intent(MapsActivity.this, SettingsActivity.class);
                 startActivity(intent);
             }
         });
@@ -62,7 +59,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         FloatingActionButton fab_extra_functions = findViewById(R.id.button_extra_functions);
         fab_extra_functions.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // TODO: Inflate menu
+                if (dropdown_profiles.getVisibility() == View.VISIBLE) {
+                    dropdown_profiles.setVisibility(View.INVISIBLE);
+                    dropdown_settings.setVisibility(View.INVISIBLE);
+                } else {
+                    dropdown_profiles.setVisibility(View.VISIBLE);
+                    dropdown_settings.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -121,13 +124,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map = googleMap;
         map.setMyLocationEnabled(true);
 
-        // Test Line for Git
-
-        /*
-         Location position = map.getMyLocation(); // TODO: Find a way for camera to move to current location
-        LatLng currentLocation = new LatLng(position.getLatitude(), position.getLongitude());
-        map.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
-         */
+        // TODO: Find a way for camera to move to current location automatically on start
     }
 
     // Adapter for RecycleView

@@ -16,6 +16,8 @@ public class ProfileCreateActivity extends AppCompatActivity {
         setContentView(R.layout.profile_create_ui);
         getSupportActionBar().hide();
 
+        // TODO: Like/Dislike - Chip/ChipGroup, # of Places = RadioGroup, Time Allowed/Budget - EditText grays out when checkbox checked
+
         // EventListener for Buttons
         Button profile_create_save = findViewById(R.id.profile_create_save);
         profile_create_save.setOnClickListener(new View.OnClickListener() {
