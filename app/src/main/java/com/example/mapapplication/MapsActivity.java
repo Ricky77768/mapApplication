@@ -121,6 +121,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map = googleMap;
         map.setMyLocationEnabled(true);
 
+        // Test Line for Git
+
         /*
          Location position = map.getMyLocation(); // TODO: Find a way for camera to move to current location
         LatLng currentLocation = new LatLng(position.getLatitude(), position.getLongitude());
