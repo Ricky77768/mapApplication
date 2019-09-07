@@ -4,8 +4,10 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import androidx.fragment.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -27,25 +30,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_ui);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        // Hide certain Views
+        // Get References
         RecyclerView location_list = findViewById(R.id.location_list);
         final Button dropdown_settings = findViewById(R.id.dropdown_settings);
         final Button dropdown_profiles = findViewById(R.id.dropdown_profiles);
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+
+        // Hides map before current location is found and zoomed in
+        showHideFragment(getSupportFragmentManager().findFragmentById(R.id.map));
+
+        // Initialize the map
+        mapFragment.getMapAsync(this);
+
+
+
+        // Hide certain Views
         location_list.setVisibility(View.INVISIBLE);
         dropdown_profiles.setVisibility(View.INVISIBLE);
         dropdown_settings.setVisibility(View.INVISIBLE);
 
-        // TODO: Prevent multiple activities to startup from repeated button clicks
-        // TODO: Disables "Dropdown View" when a click not on buttons is registered
         dropdown_profiles.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
                 startActivity(intent);
+                dropdown_profiles.setEnabled(false);
+                dropdown_settings.setEnabled(false);
+                dropdown_profiles.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        dropdown_profiles.setEnabled(true);
+                        dropdown_settings.setEnabled(true);
+                    }
+                }, 500);
             }
         });
 
@@ -53,12 +72,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 Intent intent = new Intent(MapsActivity.this, SettingsActivity.class);
                 startActivity(intent);
+                dropdown_profiles.setEnabled(false);
+                dropdown_settings.setEnabled(false);
+                dropdown_profiles.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        dropdown_profiles.setEnabled(true);
+                        dropdown_settings.setEnabled(true);
+                    }
+                }, 500);
             }
         });
 
         FloatingActionButton fab_extra_functions = findViewById(R.id.button_extra_functions);
         fab_extra_functions.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                showHideFragment(getSupportFragmentManager().findFragmentById(R.id.map));
                 if (dropdown_profiles.getVisibility() == View.VISIBLE) {
                     dropdown_profiles.setVisibility(View.INVISIBLE);
                     dropdown_settings.setVisibility(View.INVISIBLE);
@@ -113,8 +142,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
+     * This is where we can add markers or lines, add listeners or move the camera.
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
@@ -124,7 +152,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map = googleMap;
         map.setMyLocationEnabled(true);
 
+        final Button dropdown_profiles = findViewById(R.id.dropdown_profiles);
+        final Button dropdown_settings = findViewById(R.id.dropdown_settings);
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                dropdown_profiles.setVisibility(View.INVISIBLE);
+                dropdown_settings.setVisibility(View.INVISIBLE);
+            }
+        });
         // TODO: Find a way for camera to move to current location automatically on start
+    }
+
+    // TODO: fragment is NULL
+    public void showHideFragment(final androidx.fragment.app.Fragment fragment) {
+        androidx.fragment.app.FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+
+        //TEST
+            Log.d("Ricky", fragTransaction.toString());
+        //TEST
+
+        fragTransaction.setCustomAnimations(android.R.animator.fade_in,
+                android.R.animator.fade_out);
+
+        if (fragment.isHidden()) {
+            fragTransaction.show(fragment);
+        } else {
+            fragTransaction.hide(fragment);
+        }
+        fragTransaction.commit();
     }
 
     // Adapter for RecycleView
