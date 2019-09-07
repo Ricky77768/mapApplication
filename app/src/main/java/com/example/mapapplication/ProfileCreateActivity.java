@@ -7,6 +7,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 
 public class ProfileCreateActivity extends AppCompatActivity {
 
@@ -16,7 +19,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
         setContentView(R.layout.profile_create_ui);
         getSupportActionBar().hide();
 
-        // TODO: Like/Dislike - Chip/ChipGroup, # of Places = RadioGroup, Time Allowed/Budget - EditText grays out when checkbox checked
+        // TODO: Like/Dislike - Chip/ChipGroup
 
         // EventListener for Buttons
         Button profile_create_save = findViewById(R.id.profile_create_save);
@@ -32,6 +35,35 @@ public class ProfileCreateActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+
+        CheckBox profile_create_checkbox_time = findViewById(R.id.profile_create_checkbox_time);
+        CheckBox profile_create_checkbox_budget = findViewById(R.id.profile_create_checkbox_budget);
+        final EditText profile_create_time = findViewById(R.id.profile_create_time);
+        final EditText profile_create_budget = findViewById(R.id.profile_create_budget);
+
+        profile_create_checkbox_time.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (buttonView.isChecked()) {
+                    profile_create_time.setEnabled(false);
+                } else {
+                    profile_create_time.setEnabled(true);
+                }
+            }
+        });
+
+        profile_create_checkbox_budget.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (buttonView.isChecked()) {
+                    profile_create_budget.setEnabled(false);
+                } else {
+                    profile_create_budget.setEnabled(true);
+                }
+            }
+        });
+
+
     }
 
     @Override
