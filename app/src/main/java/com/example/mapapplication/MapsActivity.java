@@ -4,10 +4,13 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import androidx.fragment.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.media.Image;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -39,13 +43,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
-        // Hides map before current location is found and zoomed in
-        showHideFragment(getSupportFragmentManager().findFragmentById(R.id.map));
-
         // Initialize the map
         mapFragment.getMapAsync(this);
-
-
 
         // Hide certain Views
         location_list.setVisibility(View.INVISIBLE);
@@ -87,7 +86,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         FloatingActionButton fab_extra_functions = findViewById(R.id.button_extra_functions);
         fab_extra_functions.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                showHideFragment(getSupportFragmentManager().findFragmentById(R.id.map));
                 if (dropdown_profiles.getVisibility() == View.VISIBLE) {
                     dropdown_profiles.setVisibility(View.INVISIBLE);
                     dropdown_settings.setVisibility(View.INVISIBLE);
@@ -154,6 +152,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         final Button dropdown_profiles = findViewById(R.id.dropdown_profiles);
         final Button dropdown_settings = findViewById(R.id.dropdown_settings);
+
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -161,26 +160,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 dropdown_settings.setVisibility(View.INVISIBLE);
             }
         });
-        // TODO: Find a way for camera to move to current location automatically on start
-    }
 
-    // TODO: fragment is NULL
-    public void showHideFragment(final androidx.fragment.app.Fragment fragment) {
-        androidx.fragment.app.FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+        // Acquire a reference to the system Location Manager
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
-        //TEST
-            Log.d("Ricky", fragTransaction.toString());
-        //TEST
+        // Define a listener that responds to location updates
+        LocationListener locationListener = new LocationListener() {
+            public void onLocationChanged(Location location) {}
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+            public void onProviderEnabled(String provider) {}
+            public void onProviderDisabled(String provider) {}
+        };
 
-        fragTransaction.setCustomAnimations(android.R.animator.fade_in,
-                android.R.animator.fade_out);
+        // Register the listener with the Location Manager to receive location updates
+        String locationProvider = LocationManager.NETWORK_PROVIDER;
 
-        if (fragment.isHidden()) {
-            fragTransaction.show(fragment);
-        } else {
-            fragTransaction.hide(fragment);
-        }
-        fragTransaction.commit();
+        // Move and zoom the camera
+        Location location = locationManager.getLastKnownLocation(locationProvider);
+        LatLng userLocation = new LatLng(location.getLatitude(),location.getLongitude());
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation,15));
     }
 
     // Adapter for RecycleView
