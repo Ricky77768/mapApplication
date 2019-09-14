@@ -12,9 +12,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+
+import id.zelory.compressor.Compressor;
 
 public class ProfileCreateActivity extends AppCompatActivity {
     final int REQUEST_IMAGE_CAPTURE = 1;
@@ -26,7 +33,15 @@ public class ProfileCreateActivity extends AppCompatActivity {
         setContentView(R.layout.profile_create_ui);
         getSupportActionBar().hide();
 
-        // TODO: Like/Dislike - Chip/ChipGroup
+        final SeekBar profile_create_seekbar_numOfPlaces = findViewById(R.id.profile_create_seekbar_numOfPlaces);
+        final SeekBar profile_create_seekbar_budget = findViewById(R.id.profile_create_seekbar_budget);
+        final SeekBar profile_create_seekbar_time = findViewById(R.id.profile_create_seekbar_time);
+        final TextView profile_create_text_numOfPlaces = findViewById(R.id.profile_create_text_numOfPlaces);
+        final TextView profile_create_text_budget = findViewById(R.id.profile_create_text_budget);
+        final TextView profile_create_text_time = findViewById(R.id.profile_create_text_time);
+        ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
+        CheckBox profile_create_checkbox_time = findViewById(R.id.profile_create_checkbox_time);
+        CheckBox profile_create_checkbox_budget = findViewById(R.id.profile_create_checkbox_budget);
 
         // EventListener for Buttons
         Button profile_create_save = findViewById(R.id.profile_create_save);
@@ -43,19 +58,15 @@ public class ProfileCreateActivity extends AppCompatActivity {
             }
         });
 
-        ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
-        CheckBox profile_create_checkbox_time = findViewById(R.id.profile_create_checkbox_time);
-        CheckBox profile_create_checkbox_budget = findViewById(R.id.profile_create_checkbox_budget);
-        final EditText profile_create_time = findViewById(R.id.profile_create_time);
-        final EditText profile_create_budget = findViewById(R.id.profile_create_budget);
-
         profile_create_checkbox_time.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (buttonView.isChecked()) {
-                    profile_create_time.setEnabled(false);
+                    profile_create_seekbar_time.setEnabled(false);
+                    profile_create_text_time.setVisibility(View.INVISIBLE);
                 } else {
-                    profile_create_time.setEnabled(true);
+                    profile_create_seekbar_time.setEnabled(true);
+                    profile_create_text_time.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -64,12 +75,18 @@ public class ProfileCreateActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (buttonView.isChecked()) {
-                    profile_create_budget.setEnabled(false);
+                    profile_create_seekbar_budget.setEnabled(false);
+                    profile_create_text_budget.setVisibility(View.INVISIBLE);
                 } else {
-                    profile_create_budget.setEnabled(true);
+                    profile_create_seekbar_budget.setEnabled(true);
+                    profile_create_text_budget.setVisibility(View.VISIBLE);
                 }
             }
         });
+
+        createSeekBar(profile_create_seekbar_numOfPlaces, profile_create_text_numOfPlaces, 0, 5);
+        createSeekBar(profile_create_seekbar_budget, profile_create_text_budget, 0, 1000);
+        createSeekBar(profile_create_seekbar_time, profile_create_text_time, 0, 12);
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         profile_create_icon.setOnClickListener(new View.OnClickListener() {
@@ -92,6 +109,8 @@ public class ProfileCreateActivity extends AppCompatActivity {
                 builder.show();
             }
         });
+
+
 
     }
 
@@ -131,10 +150,22 @@ public class ProfileCreateActivity extends AppCompatActivity {
             Uri uri = data.getData();
 
             try {
-                // TODO: Need to compress chosen image to prevent lag
+                // TODO: Add loading screen when compressing image
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+
+                File f = new File(this.getCacheDir(), "Sample");
+                f.createNewFile();
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+                byte[] bitmapdata = bos.toByteArray();
+                FileOutputStream fos = new FileOutputStream(f);
+                fos.write(bitmapdata);
+                fos.flush();
+                fos.close();
+
                 ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
-                profile_create_icon.setImageBitmap(bitmap);
+                profile_create_icon.setImageBitmap(new Compressor(this).compressToBitmap(f));
+
             } catch (IOException e) { }
 
         }
@@ -167,4 +198,26 @@ public class ProfileCreateActivity extends AppCompatActivity {
         AlertDialog alert11 = builder1.create();
         alert11.show();
     }
+
+    public void createSeekBar(final SeekBar sb, final TextView progressText, final int minValue, int maxValue){
+        sb.setMin(minValue);
+        sb.setMax(maxValue);
+        sb.setProgress( (minValue + maxValue) / 2);
+        progressText.setText(sb.getProgress() + "");
+
+        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                progressText.setText(progress + "");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) { }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) { }
+        });
+    }
+
 }

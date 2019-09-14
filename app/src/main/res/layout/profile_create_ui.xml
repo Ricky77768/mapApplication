@@ -6,6 +6,43 @@
     android:layout_height="match_parent"
     tools:context=".ProfileCreateActivity">
 
+    <com.google.android.material.chip.ChipGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_text2">
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            app:chipBackgroundColor="@color/chip_bg_colors"
+            android:id="@+id/profile_create_chip_shop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Shops"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            app:chipBackgroundColor="@color/chip_bg_colors"
+            android:id="@+id/profile_create_chip_attractions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Attractions"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            app:chipBackgroundColor="@color/chip_bg_colors"
+            android:id="@+id/profile_create_chip_restaurants"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Restaurants"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+
+    </com.google.android.material.chip.ChipGroup>
+
     <Button
         android:id="@+id/profile_create_save"
         android:layout_width="wrap_content"
@@ -59,34 +96,6 @@
         app:layout_constraintStart_toEndOf="@+id/profile_create_icon"
         app:layout_constraintTop_toTopOf="@+id/profile_create_icon" />
 
-    <EditText
-        android:id="@+id/profile_create_budget"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:ems="10"
-        android:hint="Number..."
-        android:inputType="number"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/profile_create_checkbox_budget"
-        app:layout_constraintTop_toTopOf="@+id/profile_create_text5" />
-
-    <EditText
-        android:id="@+id/profile_create_time"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:ems="10"
-        android:hint="Number..."
-        android:inputType="numberDecimal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/profile_create_checkbox_time"
-        app:layout_constraintTop_toTopOf="@+id/profile_create_text4" />
-
     <ImageView
         android:id="@+id/profile_create_icon"
         android:layout_width="100dp"
@@ -97,66 +106,48 @@
         app:layout_constraintTop_toBottomOf="@+id/profile_create_cancel"
         app:srcCompat="@drawable/ic_launcher_background" />
 
-    <RadioGroup
-        android:id="@+id/profile_create_places"
-        android:layout_width="wrap_content"
+    <SeekBar
+        android:id="@+id/profile_create_seekbar_numOfPlaces"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:orientation='horizontal'
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_create_text3">
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_text3" />
 
-        <RadioButton
-            android:id="@+id/radioButton1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="1" />
-
-        <RadioButton
-            android:id="@+id/radioButton2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="2" />
-
-        <RadioButton
-            android:id="@+id/radioButton3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="3" />
-
-        <RadioButton
-            android:id="@+id/radioButton4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="4" />
-
-        <RadioButton
-            android:id="@+id/radioButton5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="5" />
-
-    </RadioGroup>
-
-    <TextView
-        android:id="@+id/profile_create_text"
-        android:layout_width="wrap_content"
+    <SeekBar
+        android:id="@+id/profile_create_seekbar_time"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="64dp"
-        android:text="Likes..."
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_create_icon" />
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/profile_create_checkbox_time"
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_text4" />
+
+    <SeekBar
+        android:id="@+id/profile_create_seekbar_budget"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/profile_create_checkbox_budget"
+        app:layout_constraintTop_toTopOf="@+id/profile_create_checkbox_budget" />
 
     <TextView
         android:id="@+id/profile_create_text2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="64dp"
-        android:text="Dislikes..."
+        android:layout_marginTop="32dp"
+        android:text="Wants to Visit..."
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_create_text" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_icon" />
 
     <TextView
         android:id="@+id/profile_create_text3"
@@ -164,7 +155,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="48dp"
-        android:text="Number of Places..."
+        android:text="Number of Places"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_create_text2" />
 
@@ -173,10 +164,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="64dp"
-        android:text="Time Allowed... (Hrs)"
+        android:layout_marginTop="48dp"
+        android:text="Time Allowed (Hrs)"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_create_text3" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_seekbar_numOfPlaces" />
 
     <TextView
         android:id="@+id/profile_create_text5"
@@ -184,8 +175,39 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="64dp"
-        android:text="Budget... ($)"
+        android:text="Budget ($)"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_create_text4" />
+
+    <TextView
+        android:id="@+id/profile_create_text_numOfPlaces"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="48dp"
+        android:text="..."
+        app:layout_constraintStart_toEndOf="@+id/profile_create_text3"
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_text2" />
+
+    <TextView
+        android:id="@+id/profile_create_text_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="48dp"
+        android:text="..."
+        app:layout_constraintStart_toEndOf="@+id/profile_create_text4"
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_seekbar_numOfPlaces" />
+
+    <TextView
+        android:id="@+id/profile_create_text_budget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="38dp"
+        android:text="..."
+        app:layout_constraintStart_toEndOf="@+id/profile_create_text5"
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_seekbar_time" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
