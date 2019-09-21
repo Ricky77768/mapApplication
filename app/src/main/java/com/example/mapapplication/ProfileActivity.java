@@ -14,7 +14,13 @@ import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
+
 public class ProfileActivity extends AppCompatActivity {
+    final int CREATE_PROFILE = 1;
+    // ProfileInfo[] profiles = new ProfileInfo[7];
+    ArrayList<ProfileInfo> profiles = new ArrayList<>();
+    RecyclerView.Adapter mAdapter = new ProfileActivity.MyAdapter(profiles);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,32 +29,20 @@ public class ProfileActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         // EventListener for FAB
-        FloatingActionButton fab_profile = findViewById(R.id.profile_create);
+        final FloatingActionButton fab_profile = findViewById(R.id.profile_create);
         fab_profile.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                fab_profile.setEnabled(false);
+                fab_profile.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        fab_profile.setEnabled(true);
+                    }
+                }, 500);
                 Intent intent = new Intent(ProfileActivity.this, ProfileCreateActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, CREATE_PROFILE);
             }
         });
-
-        // TEMPORARY CODE
-        ProfileInfo[] test2 =  new ProfileInfo[15];
-        test2[0] = new ProfileInfo();
-        test2[1] = new ProfileInfo();
-        test2[2] = new ProfileInfo();
-        test2[3] = new ProfileInfo();
-        test2[4] = new ProfileInfo();
-        test2[5] = new ProfileInfo();
-        test2[6] = new ProfileInfo();
-        test2[7] = new ProfileInfo();
-        test2[8] = new ProfileInfo();
-        test2[9] = new ProfileInfo();
-        test2[10] = new ProfileInfo();
-        test2[11] = new ProfileInfo();
-        test2[12] = new ProfileInfo();
-        test2[13] = new ProfileInfo();
-        test2[14] = new ProfileInfo();
-        // TEMPORARY CODE
 
         RecyclerView profile_list = findViewById(R.id.profile_list);
         profile_list.setHasFixedSize(false);
@@ -56,35 +50,47 @@ public class ProfileActivity extends AppCompatActivity {
         // Create LayoutManager
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         profile_list.setLayoutManager(mLayoutManager);
-
-        // Create/Specify Adapters
-        RecyclerView.Adapter mAdapter = new ProfileActivity.MyAdapter(test2);
         profile_list.setAdapter(mAdapter);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CREATE_PROFILE && resultCode == RESULT_OK) {
+            profiles.add(new ProfileInfo(data));
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     // Adapter for RecycleView
     public class MyAdapter extends RecyclerView.Adapter<ProfileActivity.MyAdapter.MyViewHolder> {
-        private ProfileInfo[] sample;
+        private ArrayList<ProfileInfo> data;
 
         // Provide a reference to the views for each data item
         // Complex data items may need more than one view per item, and
         // you provide access to all the views for a data item in a view holder
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public TextView profile_name;
-            public TextView profile_otherInfo;
+            public TextView profile_text_numOfPlaces;
+            public TextView profile_text_time;
+            public TextView profile_text_budget;
+            public TextView profile_tags;
             public ImageView profile_picture;
 
             public MyViewHolder(View v) {
                 super(v);
                 profile_name = v.findViewById(R.id.profile_name);
-                profile_otherInfo = v.findViewById(R.id.profile_otherinfo);
+                profile_text_numOfPlaces = v.findViewById(R.id.profile_text_numOfPlaces);
+                profile_text_budget = v.findViewById(R.id.profile_text_budget);
+                profile_text_time = v.findViewById(R.id.profile_text_time);
+                profile_tags = v.findViewById(R.id.profile_tags);
                 profile_picture = v.findViewById(R.id.profile_picture);
             }
         }
 
         // Provide data to initialize
-        public MyAdapter(ProfileInfo[] myDataset) {
-            sample = myDataset;
+        public MyAdapter(ArrayList<ProfileInfo> myDataset) {
+            data = myDataset;
         }
 
         // Create new View (by Layout Manager)
@@ -98,14 +104,16 @@ public class ProfileActivity extends AppCompatActivity {
         // Replace a View (by Layout Manager) (position is the current index of dataset based on which View)
         @Override
         public void onBindViewHolder(ProfileActivity.MyAdapter.MyViewHolder holder, int position) {
-            holder.profile_name.setText(sample[position].name + position);
-            holder.profile_otherInfo.setText(sample[position].description);
+            holder.profile_name.setText(data.get(position).name);
+            holder.profile_text_numOfPlaces.setText("Places to Visit: " + data.get(position).numOfPlaces);
+            holder.profile_text_budget.setText("Budget ($): " + data.get(position).budget);
+            holder.profile_text_time.setText("Time Allowed (Hrs): " + data.get(position).time);
             holder.profile_picture.setImageResource(R.drawable.ic_launcher_background);
         }
 
         @Override
         public int getItemCount() {
-            return sample.length;
+            return data.size();
         }
     }
 }

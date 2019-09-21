@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -39,21 +40,62 @@ public class ProfileCreateActivity extends AppCompatActivity {
         final TextView profile_create_text_numOfPlaces = findViewById(R.id.profile_create_text_numOfPlaces);
         final TextView profile_create_text_budget = findViewById(R.id.profile_create_text_budget);
         final TextView profile_create_text_time = findViewById(R.id.profile_create_text_time);
-        ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
-        CheckBox profile_create_checkbox_time = findViewById(R.id.profile_create_checkbox_time);
-        CheckBox profile_create_checkbox_budget = findViewById(R.id.profile_create_checkbox_budget);
+        final EditText profile_create_profile_name = findViewById(R.id.profile_create_profile_name);
+        final Button profile_create_save = findViewById(R.id.profile_create_save);
+        final Button profile_create_cancel = findViewById(R.id.profile_create_cancel);
+        final ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
+        final CheckBox profile_create_checkbox_time = findViewById(R.id.profile_create_checkbox_time);
+        final CheckBox profile_create_checkbox_budget = findViewById(R.id.profile_create_checkbox_budget);
 
         // EventListener for Buttons
-        Button profile_create_save = findViewById(R.id.profile_create_save);
         profile_create_save.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                profile_create_save.setEnabled(false);
+                profile_create_cancel.setEnabled(false);
+                profile_create_save.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        profile_create_save.setEnabled(true);
+                        profile_create_cancel.setEnabled(true);
+                    }
+                }, 500);
+
+                // TODO - Tags/Profile Picture
+                Intent data = new Intent();
+                String name = profile_create_profile_name.getText().toString();
+                String numOfPlaces = Integer.toString(profile_create_seekbar_numOfPlaces.getProgress());
+                String budget = Integer.toString(profile_create_seekbar_budget.getProgress());
+                String time = Integer.toString(profile_create_seekbar_time.getProgress());
+
+                // Check if checkboxes are checked
+                if (profile_create_checkbox_time.isChecked()) {
+                    time = "Unlimited";
+                }
+
+                if (profile_create_checkbox_budget.isChecked()) {
+                    budget = "Unlimited";
+                }
+
+                data.putExtra("P_name", name);
+                data.putExtra("P_numOfPlaces", numOfPlaces);
+                data.putExtra("P_time",time);
+                data.putExtra("P_budget", budget);
+                setResult(RESULT_OK, data);
                 finish();
             }
         });
 
-        Button profile_create_cancel = findViewById(R.id.profile_create_cancel);
         profile_create_cancel.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                profile_create_save.setEnabled(false);
+                profile_create_cancel.setEnabled(false);
+                profile_create_save.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        profile_create_save.setEnabled(true);
+                        profile_create_cancel.setEnabled(true);
+                    }
+                }, 500);
                 onBackPressed();
             }
         });
@@ -122,7 +164,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
         }
     }
 
-    // For choosing picture from album
+    // For choosing image from album
     public void choosePicture() {
         Intent intent = new Intent();
 
