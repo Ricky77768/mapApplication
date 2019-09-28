@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,10 +35,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // References
         RecyclerView location_list = findViewById(R.id.location_list);
-        FloatingActionButton fab_extra_functions = findViewById(R.id.button_extra_functions);
+        FloatingActionButton fab_extra_functions = findViewById(R.id.fab_extra_functions);
+        final FloatingActionButton fab_search = findViewById(R.id.fab_search);
         final Button dropdown_settings = findViewById(R.id.dropdown_settings);
         final Button dropdown_profiles = findViewById(R.id.dropdown_profiles);
-        final Button search = findViewById(R.id.button_search);
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -98,7 +98,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        search.setOnClickListener(new View.OnClickListener() {
+        fab_search.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // TEMPORARY CODE
                 LocationInfo[] test = new LocationInfo[5];

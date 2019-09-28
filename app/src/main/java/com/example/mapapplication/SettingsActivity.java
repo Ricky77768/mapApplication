@@ -20,7 +20,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_ui);
-        getSupportActionBar().hide();
+        getSupportActionBar().setTitle("Settings");
 
         Spinner map_type = findViewById(R.id.setting_map_type);
 

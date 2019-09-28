@@ -19,50 +19,53 @@
         tools:context=".MapsActivity" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_extra_functions"
+        android:id="@+id/fab_extra_functions"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="16dp"
         android:clickable="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/map"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        app:fabSize="mini"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/map"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_compass" />
 
-    <Button
-        android:id="@+id/dropdown_profiles"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Profiles"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dropdown_settings" />
 
-    <Button
-        android:id="@+id/dropdown_settings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Settings"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_extra_functions" />
-
-    <Button
-        android:id="@+id/button_search"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="@android:string/search_go"
+        android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_search" />
+
+    <Button
+        android:id="@+id/dropdown_profiles"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Profiles"
+        app:layout_constraintBottom_toTopOf="@+id/fab_extra_functions"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/dropdown_settings"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Settings"
+        app:layout_constraintBottom_toTopOf="@+id/dropdown_profiles"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <EditText
         android:id="@+id/input_location"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
@@ -70,7 +73,7 @@
         android:hint="Enter Location..."
         android:inputType="textPersonName"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button_search"
+        app:layout_constraintEnd_toStartOf="@+id/fab_search"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView

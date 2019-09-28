@@ -31,7 +31,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_ui);
-        getSupportActionBar().hide();
+        getSupportActionBar().setTitle("Profiles");
 
         // References
         final FloatingActionButton fab_profile = findViewById(R.id.profile_create);
@@ -144,21 +144,21 @@ public class ProfileActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(ProfileActivity.this, ProfileCreateActivity.class);
-                    intent.putExtra("PC_name", profiles.get(holder.getAdapterPosition()).name);
-                    intent.putStringArrayListExtra("PC_tags", profiles.get(holder.getAdapterPosition()).tags);
-                    intent.putExtra("PC_numOfPlaces", profiles.get(holder.getAdapterPosition()).numOfPlaces);
+                    intent.putExtra("P_edit_name", profiles.get(holder.getAdapterPosition()).name);
+                    intent.putStringArrayListExtra("P_edit_tags", profiles.get(holder.getAdapterPosition()).tags);
+                    intent.putExtra("P_edit_numOfPlaces", profiles.get(holder.getAdapterPosition()).numOfPlaces);
 
                     if (profiles.get(holder.getAdapterPosition()).time.equals("Unlimited")) {
-                        intent.putExtra("PC_time", "Unlimited");
+                        intent.putExtra("P_edit_time", "Unlimited");
                     } else {
-                        intent.putExtra("PC_time", profiles.get(holder.getAdapterPosition()).time);
+                        intent.putExtra("P_edit_time", profiles.get(holder.getAdapterPosition()).time);
                     }
 
                     if (profiles.get(holder.getAdapterPosition()).budget.equals("Unlimited")) {
-                        intent.putExtra("PC_budget", "Unlimited");
+                        intent.putExtra("P_edit_budget", "Unlimited");
                     }
-                    intent.putExtra("PC_budget", profiles.get(holder.getAdapterPosition()).budget);
-                    intent.putExtra("PC_position", holder.getAdapterPosition());
+                    intent.putExtra("P_edit_budget", profiles.get(holder.getAdapterPosition()).budget);
+                    intent.putExtra("P_edit_position", holder.getAdapterPosition());
                     startActivityForResult(intent, EDIT_PROFILE);
                 }
             });

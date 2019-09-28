@@ -106,8 +106,8 @@ public class ProfileCreateActivity extends AppCompatActivity {
 
                 // If editing a profile, then get the position of the profile in the RecycleView
                 Intent previousIntent = getIntent();
-                if (previousIntent.hasExtra("PC_position")) {
-                    data.putExtra("P_position", previousIntent.getIntExtra("PC_position", -1));
+                if (previousIntent.hasExtra("P_edit_position")) {
+                    data.putExtra("P_position", previousIntent.getIntExtra("P_edit_position", -1));
                 }
 
                 // data.putExtra("icon", *SOMETHING*);
