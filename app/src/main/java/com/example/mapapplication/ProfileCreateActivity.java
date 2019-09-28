@@ -42,6 +42,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
         setContentView(R.layout.profile_create_ui);
         getSupportActionBar().hide();
 
+        // References
         final SeekBar profile_create_seekbar_numOfPlaces = findViewById(R.id.profile_create_seekbar_numOfPlaces);
         final SeekBar profile_create_seekbar_budget = findViewById(R.id.profile_create_seekbar_budget);
         final SeekBar profile_create_seekbar_time = findViewById(R.id.profile_create_seekbar_time);
@@ -56,7 +57,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
         final CheckBox profile_create_checkbox_budget = findViewById(R.id.profile_create_checkbox_budget);
         final ChipGroup profile_create_chipgroup = findViewById(R.id.profile_create_chipgroup);
 
-        // EventListener for Buttons
+        // Click Listeners
         profile_create_save.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 profile_create_save.setEnabled(false);
@@ -70,6 +71,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
                 }, 500);
 
                 // TODO - Profile Picture OR simplify down to choose a set of icons
+                // Passes all data into an intent for profile creation
                 Intent data = new Intent();
                 String name = profile_create_profile_name.getText().toString();
                 String numOfPlaces = Integer.toString(profile_create_seekbar_numOfPlaces.getProgress());
@@ -77,7 +79,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
                 String time = Integer.toString(profile_create_seekbar_time.getProgress());
                 ArrayList<String> tags = new ArrayList<>();
 
-                // Check if checkboxes are checked
+                // Check if checkboxes are checked, which indicate that parameter does not matter
                 if (profile_create_checkbox_time.isChecked()) {
                     time = "Unlimited";
                 }
@@ -102,12 +104,13 @@ public class ProfileCreateActivity extends AppCompatActivity {
                 data.putExtra("P_budget", budget);
                 data.putStringArrayListExtra("P_tags", tags);
 
+                // If editing a profile, then get the position of the profile in the RecycleView
                 Intent previousIntent = getIntent();
                 if (previousIntent.hasExtra("PC_position")) {
                     data.putExtra("P_position", previousIntent.getIntExtra("PC_position", -1));
                 }
 
-                //data.putExtra("icon", *SOMETHING*);
+                // data.putExtra("icon", *SOMETHING*);
                 setResult(RESULT_OK, data);
                 finish();
             }
@@ -158,12 +161,13 @@ public class ProfileCreateActivity extends AppCompatActivity {
         createSeekBar(profile_create_seekbar_budget, profile_create_text_budget, 0, 1000);
         createSeekBar(profile_create_seekbar_time, profile_create_text_time, 0, 12);
 
-        // Check if this is to "edit" a profile
+        // Check if this is to edit a existing profile
         Intent intent = getIntent();
         if (intent.hasExtra("PC_name")) {
             setValues();
         }
 
+        // For profile pictures (MAY BE REMOVED)
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         profile_create_icon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -190,7 +194,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
 
     }
 
-    // For taking picture
+    // For taking picture (MAY BE REMOVED)
     public void takePicture() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -198,7 +202,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
         }
     }
 
-    // For choosing image from album
+    // For choosing image from album (MAY BE REMOVED)
     public void choosePicture() {
         Intent intent = new Intent();
 
@@ -210,7 +214,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
     }
 
-    // To handle picture selection
+    // To handle picture selection (MAY BE REMOVED)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -247,8 +251,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    // Creates an alert to warn user that created profile will not be saved
+    @Override // Creates an alert to warn user that created profile will not be saved
     public void onBackPressed() {
         AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
         builder1.setMessage("This profile will NOT be saved, exit?");
@@ -296,9 +299,11 @@ public class ProfileCreateActivity extends AppCompatActivity {
         });
     }
 
+    // Method to set the values of the existing profile
     public void setValues() {
         Intent passedData = getIntent();
 
+        // References
         final SeekBar profile_create_seekbar_numOfPlaces = findViewById(R.id.profile_create_seekbar_numOfPlaces);
         final SeekBar profile_create_seekbar_budget = findViewById(R.id.profile_create_seekbar_budget);
         final SeekBar profile_create_seekbar_time = findViewById(R.id.profile_create_seekbar_time);

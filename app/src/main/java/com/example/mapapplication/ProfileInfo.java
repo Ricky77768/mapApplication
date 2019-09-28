@@ -7,32 +7,26 @@ import android.os.Bundle;
 
 import java.util.ArrayList;
 
+// TODO: Implement Icon Sync once sorted out
 public class ProfileInfo {
 
-    // Also for icon
+    int position; // For RecycleView - Determine which profile to edit
     String name, numOfPlaces, budget, time;
-    int position; // For recycle view/Edit profile
-    // Bitmap icon;
     ArrayList<String> tags;
+    // Bitmap icon;
 
+    // Profile Creation
     public ProfileInfo(Intent data) {
         name = data.getStringExtra("P_name");
         numOfPlaces = data.getStringExtra("P_numOfPlaces");
         budget = data.getStringExtra("P_budget");
         time = data.getStringExtra("P_time");
         tags = data.getStringArrayListExtra("P_tags");
+        // icon = data.getParcelableExtra("icon");
 
         if (data.hasExtra("P_position")) {
             position = data.getIntExtra("P_position", -1);
         }
-        // icon = data.getParcelableExtra("icon");
-    }
-
-    public ProfileInfo() {
-        name = "placeholder";
-        numOfPlaces = "placeholder";
-        budget = "placeholder";
-        time = "placeholder";
     }
 
 }

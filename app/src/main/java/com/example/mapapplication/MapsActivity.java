@@ -34,10 +34,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_ui);
 
-        // Get References
+        // References
         RecyclerView location_list = findViewById(R.id.location_list);
+        FloatingActionButton fab_extra_functions = findViewById(R.id.button_extra_functions);
         final Button dropdown_settings = findViewById(R.id.dropdown_settings);
         final Button dropdown_profiles = findViewById(R.id.dropdown_profiles);
+        final Button search = findViewById(R.id.button_search);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -51,6 +53,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         dropdown_profiles.setVisibility(View.INVISIBLE);
         dropdown_settings.setVisibility(View.INVISIBLE);
 
+        // Click Listeners
         dropdown_profiles.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
@@ -83,7 +86,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        FloatingActionButton fab_extra_functions = findViewById(R.id.button_extra_functions);
         fab_extra_functions.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (dropdown_profiles.getVisibility() == View.VISIBLE) {
@@ -96,11 +98,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        // EventListener for "search" button, brings up the previously hidden RecycleView
-        Button search = findViewById(R.id.button_search);
         search.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
                 // TEMPORARY CODE
                 LocationInfo[] test = new LocationInfo[5];
                 test[0] = new LocationInfo();
@@ -127,7 +126,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    // If RecycleView is open, close it. Else exits the app.
+    // If RecycleView is open, close it instead. Else, close the app.
     public void onBackPressed() {
         RecyclerView location_list = findViewById(R.id.location_list);
         if (location_list.getVisibility() == View.VISIBLE) {
@@ -150,9 +149,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map = googleMap;
         map.setMyLocationEnabled(true);
 
+        // References
         final Button dropdown_profiles = findViewById(R.id.dropdown_profiles);
         final Button dropdown_settings = findViewById(R.id.dropdown_settings);
 
+        // If extra function buttons are displayed, tapping the map will collapse them
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -175,7 +176,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Register the listener with the Location Manager to receive location updates
         String locationProvider = LocationManager.NETWORK_PROVIDER;
 
-        // Move and zoom the camera
+        // Move and zoom the camera to current location
         Location location = locationManager.getLastKnownLocation(locationProvider);
         LatLng userLocation = new LatLng(location.getLatitude(),location.getLongitude());
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation,15));

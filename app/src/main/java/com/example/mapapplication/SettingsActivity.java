@@ -20,9 +20,10 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_ui);
-        getSupportActionBar().hide(); //hide the title bar
+        getSupportActionBar().hide();
 
         Spinner map_type = findViewById(R.id.setting_map_type);
+
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.map_types, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         map_type.setAdapter(adapter);
@@ -30,7 +31,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         map_type.setSelection(MapsActivity.map.getMapType() - 1);
     }
 
-    @Override
+    @Override // Switches map type
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String map_type = parent.getItemAtPosition(position).toString();
         switch (map_type) {

@@ -210,5 +210,4 @@
         app:layout_constraintStart_toEndOf="@+id/profile_create_text5"
         app:layout_constraintTop_toBottomOf="@+id/profile_create_seekbar_time" />
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>

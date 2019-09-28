@@ -22,7 +22,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 
 public class ProfileActivity extends AppCompatActivity {
-
     final int CREATE_PROFILE = 1;
     final int EDIT_PROFILE = 2;
     ArrayList<ProfileInfo> profiles = new ArrayList<>();
@@ -34,8 +33,10 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.profile_ui);
         getSupportActionBar().hide();
 
-        // EventListener for FAB
+        // References
         final FloatingActionButton fab_profile = findViewById(R.id.profile_create);
+
+        // Click Listener
         fab_profile.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 fab_profile.setEnabled(false);
@@ -62,10 +63,13 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        // Create a profile
         if (requestCode == CREATE_PROFILE && resultCode == RESULT_OK) {
             profiles.add(new ProfileInfo(data));
         }
 
+        // Editing an existing profile
         if (requestCode == EDIT_PROFILE && resultCode == RESULT_OK) {
             profiles.set(data.getIntExtra("P_position", -1), new ProfileInfo(data));
         }
@@ -116,9 +120,11 @@ public class ProfileActivity extends AppCompatActivity {
             return vh;
         }
 
-        // Replace a View (by Layout Manager) (position is the current index of dataset based on which View)
+        // Replace a View (by Layout Manager)
         @Override
         public void onBindViewHolder(final ProfileActivity.MyAdapter.MyViewHolder holder, int position) {
+
+            // Display related information onto each profile
             holder.profile_name.setText(data.get(position).name);
             holder.profile_text_numOfPlaces.setText("Places to Visit: " + data.get(position).numOfPlaces);
             holder.profile_text_budget.setText("Budget ($): " + data.get(position).budget);
@@ -132,6 +138,8 @@ public class ProfileActivity extends AppCompatActivity {
             holder.profile_tags.setText(tags_description);
 
             // Click Listeners
+
+            // It will pass current profile's information into a ProfileCreateActivity
             holder.profile_edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -155,6 +163,7 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             });
 
+            // Prompts a warning box about deleting the selected profile
             holder.profile_delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -193,5 +202,6 @@ public class ProfileActivity extends AppCompatActivity {
         public int getItemCount() {
             return data.size();
         }
+
     }
 }
