@@ -5,9 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -17,10 +21,14 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import id.zelory.compressor.Compressor;
 
@@ -46,6 +54,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
         final ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
         final CheckBox profile_create_checkbox_time = findViewById(R.id.profile_create_checkbox_time);
         final CheckBox profile_create_checkbox_budget = findViewById(R.id.profile_create_checkbox_budget);
+        final ChipGroup profile_create_chipgroup = findViewById(R.id.profile_create_chipgroup);
 
         // EventListener for Buttons
         profile_create_save.setOnClickListener(new View.OnClickListener() {
@@ -60,12 +69,13 @@ public class ProfileCreateActivity extends AppCompatActivity {
                     }
                 }, 500);
 
-                // TODO - Tags/Profile Picture
+                // TODO - Profile Picture OR simplify down to choose a set of icons
                 Intent data = new Intent();
                 String name = profile_create_profile_name.getText().toString();
                 String numOfPlaces = Integer.toString(profile_create_seekbar_numOfPlaces.getProgress());
                 String budget = Integer.toString(profile_create_seekbar_budget.getProgress());
                 String time = Integer.toString(profile_create_seekbar_time.getProgress());
+                ArrayList<String> tags = new ArrayList<>();
 
                 // Check if checkboxes are checked
                 if (profile_create_checkbox_time.isChecked()) {
@@ -76,10 +86,28 @@ public class ProfileCreateActivity extends AppCompatActivity {
                     budget = "Unlimited";
                 }
 
+                // Check for tags selected
+                for (int i = 0; i < profile_create_chipgroup.getChildCount(); i++) {
+                    View view = profile_create_chipgroup.getChildAt(i);
+                    if (view instanceof Chip) {
+                        if (((Chip) view).isChecked()) {
+                            tags.add(((Chip) view).getText().toString());
+                        }
+                    }
+                }
+
                 data.putExtra("P_name", name);
                 data.putExtra("P_numOfPlaces", numOfPlaces);
                 data.putExtra("P_time",time);
                 data.putExtra("P_budget", budget);
+                data.putStringArrayListExtra("P_tags", tags);
+
+                Intent previousIntent = getIntent();
+                if (previousIntent.hasExtra("PC_position")) {
+                    data.putExtra("P_position", previousIntent.getIntExtra("PC_position", -1));
+                }
+
+                //data.putExtra("icon", *SOMETHING*);
                 setResult(RESULT_OK, data);
                 finish();
             }
@@ -129,6 +157,12 @@ public class ProfileCreateActivity extends AppCompatActivity {
         createSeekBar(profile_create_seekbar_numOfPlaces, profile_create_text_numOfPlaces, 0, 5);
         createSeekBar(profile_create_seekbar_budget, profile_create_text_budget, 0, 1000);
         createSeekBar(profile_create_seekbar_time, profile_create_text_time, 0, 12);
+
+        // Check if this is to "edit" a profile
+        Intent intent = getIntent();
+        if (intent.hasExtra("PC_name")) {
+            setValues();
+        }
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         profile_create_icon.setOnClickListener(new View.OnClickListener() {
@@ -262,4 +296,41 @@ public class ProfileCreateActivity extends AppCompatActivity {
         });
     }
 
+    public void setValues() {
+        Intent passedData = getIntent();
+
+        final SeekBar profile_create_seekbar_numOfPlaces = findViewById(R.id.profile_create_seekbar_numOfPlaces);
+        final SeekBar profile_create_seekbar_budget = findViewById(R.id.profile_create_seekbar_budget);
+        final SeekBar profile_create_seekbar_time = findViewById(R.id.profile_create_seekbar_time);
+        final EditText profile_create_profile_name = findViewById(R.id.profile_create_profile_name);
+        final ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
+        final CheckBox profile_create_checkbox_time = findViewById(R.id.profile_create_checkbox_time);
+        final CheckBox profile_create_checkbox_budget = findViewById(R.id.profile_create_checkbox_budget);
+        final ChipGroup profile_create_chipgroup = findViewById(R.id.profile_create_chipgroup);
+
+        profile_create_profile_name.setText(passedData.getStringExtra("PC_name"));
+        profile_create_seekbar_numOfPlaces.setProgress(Integer.parseInt(passedData.getStringExtra("PC_numOfPlaces")));
+
+        if (passedData.getStringExtra("PC_time").equals("Unlimited")) {
+            profile_create_checkbox_time.setChecked(true);
+        } else {
+            profile_create_seekbar_time.setProgress(Integer.parseInt(passedData.getStringExtra("PC_time")));
+        }
+
+        if (passedData.getStringExtra("PC_budget").equals("Unlimited")) {
+            profile_create_checkbox_budget.setChecked(true);
+        } else {
+            profile_create_seekbar_budget.setProgress(Integer.parseInt(passedData.getStringExtra("PC_budget")));
+        }
+
+        for (int i = 0; i < profile_create_chipgroup.getChildCount(); i++) {
+            View view = profile_create_chipgroup.getChildAt(i);
+            if (view instanceof Chip) {
+                if (passedData.getStringArrayListExtra("PC_tags").indexOf(((Chip) view).getText().toString()) != -1) {
+                    ((Chip) view).setChecked(true);
+                }
+            }
+        }
+
+    }
 }

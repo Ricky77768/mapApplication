@@ -7,6 +7,7 @@
     tools:context=".ProfileCreateActivity">
 
     <com.google.android.material.chip.ChipGroup
+        android:id="@+id/profile_create_chipgroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -14,31 +15,31 @@
         app:layout_constraintTop_toBottomOf="@+id/profile_create_text2">
 
         <com.google.android.material.chip.Chip
+            android:id="@+id/chip"
             style="@style/Widget.MaterialComponents.Chip.Choice"
-            app:chipBackgroundColor="@color/chip_bg_colors"
-            android:id="@+id/profile_create_chip_shop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Shops"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:chipBackgroundColor="@color/chip_bg_colors" />
 
         <com.google.android.material.chip.Chip
+            android:id="@+id/chip2"
             style="@style/Widget.MaterialComponents.Chip.Choice"
-            app:chipBackgroundColor="@color/chip_bg_colors"
-            android:id="@+id/profile_create_chip_attractions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Attractions"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:chipBackgroundColor="@color/chip_bg_colors" />
 
         <com.google.android.material.chip.Chip
+            android:id="@+id/chip3"
             style="@style/Widget.MaterialComponents.Chip.Choice"
-            app:chipBackgroundColor="@color/chip_bg_colors"
-            android:id="@+id/profile_create_chip_restaurants"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Restaurants"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:chipBackgroundColor="@color/chip_bg_colors" />
 
 
     </com.google.android.material.chip.ChipGroup>
