@@ -163,7 +163,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
 
         // Check if this is to edit a existing profile
         Intent intent = getIntent();
-        if (intent.hasExtra("PC_name")) {
+        if (intent.hasExtra("P_edit_name")) {
             setValues();
         }
 
@@ -313,25 +313,25 @@ public class ProfileCreateActivity extends AppCompatActivity {
         final CheckBox profile_create_checkbox_budget = findViewById(R.id.profile_create_checkbox_budget);
         final ChipGroup profile_create_chipgroup = findViewById(R.id.profile_create_chipgroup);
 
-        profile_create_profile_name.setText(passedData.getStringExtra("PC_name"));
-        profile_create_seekbar_numOfPlaces.setProgress(Integer.parseInt(passedData.getStringExtra("PC_numOfPlaces")));
+        profile_create_profile_name.setText(passedData.getStringExtra("P_edit_name"));
+        profile_create_seekbar_numOfPlaces.setProgress(Integer.parseInt(passedData.getStringExtra("P_edit_numOfPlaces")));
 
-        if (passedData.getStringExtra("PC_time").equals("Unlimited")) {
+        if (passedData.getStringExtra("P_edit_time").equals("Unlimited")) {
             profile_create_checkbox_time.setChecked(true);
         } else {
-            profile_create_seekbar_time.setProgress(Integer.parseInt(passedData.getStringExtra("PC_time")));
+            profile_create_seekbar_time.setProgress(Integer.parseInt(passedData.getStringExtra("P_edit_time")));
         }
 
-        if (passedData.getStringExtra("PC_budget").equals("Unlimited")) {
+        if (passedData.getStringExtra("P_edit_budget").equals("Unlimited")) {
             profile_create_checkbox_budget.setChecked(true);
         } else {
-            profile_create_seekbar_budget.setProgress(Integer.parseInt(passedData.getStringExtra("PC_budget")));
+            profile_create_seekbar_budget.setProgress(Integer.parseInt(passedData.getStringExtra("P_edit_budget")));
         }
 
         for (int i = 0; i < profile_create_chipgroup.getChildCount(); i++) {
             View view = profile_create_chipgroup.getChildAt(i);
             if (view instanceof Chip) {
-                if (passedData.getStringArrayListExtra("PC_tags").indexOf(((Chip) view).getText().toString()) != -1) {
+                if (passedData.getStringArrayListExtra("P_edit_tags").indexOf(((Chip) view).getText().toString()) != -1) {
                     ((Chip) view).setChecked(true);
                 }
             }
