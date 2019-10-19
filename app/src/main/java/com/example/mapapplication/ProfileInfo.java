@@ -11,7 +11,8 @@ import java.util.ArrayList;
 public class ProfileInfo {
 
     int position; // For RecycleView - Determine which profile to edit
-    String name, numOfPlaces, budget, time;
+    String name, numOfPlaces, budget, time, rating; // Values to display
+    String rawBudget, rawTime, rawRating; // Integer values for internal calculations
     ArrayList<String> tags;
     // Bitmap icon;
 
@@ -19,8 +20,40 @@ public class ProfileInfo {
     public ProfileInfo(Intent data) {
         name = data.getStringExtra("P_name");
         numOfPlaces = data.getStringExtra("P_numOfPlaces");
-        budget = data.getStringExtra("P_budget");
-        time = data.getStringExtra("P_time");
+
+        rawBudget = data.getStringExtra("P_budget");
+        switch (rawBudget) {
+            case "0":
+                budget = "Minimal";
+                break;
+            case "1":
+                budget = "Small";
+                break;
+            case "2":
+                budget = "Medium";
+                break;
+            case "3":
+                budget = "Large";
+                break;
+            case "4":
+                budget = "Very Large";
+                break;
+        }
+
+        rawTime = data.getStringExtra("P_time");
+        if (rawTime.equals("11")) {
+            time = "Does Not Matter";
+        } else {
+            time = rawTime;
+        }
+
+        rawRating = data.getStringExtra("P_rating");
+        if (Integer.parseInt(rawRating) <= 10) {
+            rating = "Does Not Matter";
+        } else {
+            rating = String.valueOf(Integer.parseInt(rawRating) / 10.0);
+        }
+
         tags = data.getStringArrayListExtra("P_tags");
         // icon = data.getParcelableExtra("icon");
 

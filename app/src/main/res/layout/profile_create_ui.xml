@@ -64,24 +64,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <CheckBox
-        android:id="@+id/profile_create_checkbox_budget"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:text="Unlimited"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_create_text5" />
-
-    <CheckBox
-        android:id="@+id/profile_create_checkbox_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:text="Unlimited"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_create_text4" />
-
     <EditText
         android:id="@+id/profile_create_profile_name"
         android:layout_width="0dp"
@@ -90,8 +72,8 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
         android:ems="10"
-        android:text="New Profile"
         android:inputType="textPersonName"
+        android:text="New Profile"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.7"
         app:layout_constraintStart_toEndOf="@+id/profile_create_icon"
@@ -122,23 +104,34 @@
         android:id="@+id/profile_create_seekbar_time"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="32dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/profile_create_checkbox_time"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_create_text4" />
 
     <SeekBar
         android:id="@+id/profile_create_seekbar_budget"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="32dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/profile_create_checkbox_budget"
-        app:layout_constraintTop_toTopOf="@+id/profile_create_checkbox_budget" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_text5" />
+
+    <SeekBar
+        android:id="@+id/profile_create_seekbar_rating"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_text6" />
 
     <TextView
         android:id="@+id/profile_create_text2"
@@ -146,7 +139,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
-        android:text="Wants to Visit..."
+        android:text="To Visit"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_create_icon" />
 
@@ -156,7 +149,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="48dp"
-        android:text="Number of Places"
+        android:text="Number of Places |"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_create_text2" />
 
@@ -165,8 +158,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="48dp"
-        android:text="Time Allowed (Hrs)"
+        android:layout_marginTop="32dp"
+        android:text="Traffic Time (Hrs) |"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_create_seekbar_numOfPlaces" />
 
@@ -175,10 +168,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="64dp"
-        android:text="Budget ($)"
+        android:layout_marginTop="32dp"
+        android:text="Budget |"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_create_text4" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_seekbar_time" />
+
+    <TextView
+        android:id="@+id/profile_create_text6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:text="Minimum Rating |"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_seekbar_budget" />
 
     <TextView
         android:id="@+id/profile_create_text_numOfPlaces"
@@ -195,7 +198,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="32dp"
         android:text="..."
         app:layout_constraintStart_toEndOf="@+id/profile_create_text4"
         app:layout_constraintTop_toBottomOf="@+id/profile_create_seekbar_numOfPlaces" />
@@ -205,9 +208,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="38dp"
+        android:layout_marginTop="32dp"
         android:text="..."
         app:layout_constraintStart_toEndOf="@+id/profile_create_text5"
         app:layout_constraintTop_toBottomOf="@+id/profile_create_seekbar_time" />
+
+    <TextView
+        android:id="@+id/profile_create_text_rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:text="..."
+        app:layout_constraintStart_toEndOf="@+id/profile_create_text6"
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_seekbar_budget" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

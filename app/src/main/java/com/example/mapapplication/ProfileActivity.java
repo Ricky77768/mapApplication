@@ -5,11 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,25 +83,31 @@ public class ProfileActivity extends AppCompatActivity {
         // Complex data items may need more than one view per item, and
         // you provide access to all the views for a data item in a view holder
         public class MyViewHolder extends RecyclerView.ViewHolder {
-            public TextView profile_name;
-            public TextView profile_text_numOfPlaces;
-            public TextView profile_text_time;
-            public TextView profile_text_budget;
-            public TextView profile_tags;
-            public ImageView profile_picture;
-            public Button profile_delete;
-            public Button profile_edit;
+            public TextView profile_list_name;
+            public TextView profile_list_text_numOfPlaces;
+            public TextView profile_list_text_time;
+            public TextView profile_list_text_budget;
+            public TextView profile_list_text_rating;
+            public TextView profile_list_tags;
+            public ImageView profile_list_picture;
+            public Button profile_list_delete;
+            public Button profile_list_edit;
+            public Button profile_list_select;
+
+
 
             public MyViewHolder(View v) {
                 super(v);
-                profile_name = v.findViewById(R.id.profile_name);
-                profile_text_numOfPlaces = v.findViewById(R.id.profile_text_numOfPlaces);
-                profile_text_budget = v.findViewById(R.id.profile_text_budget);
-                profile_text_time = v.findViewById(R.id.profile_text_time);
-                profile_tags = v.findViewById(R.id.profile_tags);
-                profile_picture = v.findViewById(R.id.profile_picture);
-                profile_edit = v.findViewById(R.id.profile_edit);
-                profile_delete = v.findViewById(R.id.profile_delete);
+                profile_list_name = v.findViewById(R.id.profile_list_name);
+                profile_list_text_numOfPlaces = v.findViewById(R.id.profile_list_text_numOfPlaces);
+                profile_list_text_budget = v.findViewById(R.id.profile_list_text_budget);
+                profile_list_text_time = v.findViewById(R.id.profile_list_text_time);
+                profile_list_text_rating = v.findViewById(R.id.profile_list_text_rating);
+                profile_list_tags = v.findViewById(R.id.profile_list_tags);
+                profile_list_picture = v.findViewById(R.id.profile_list_picture);
+                profile_list_edit = v.findViewById(R.id.profile_list_edit);
+                profile_list_delete = v.findViewById(R.id.profile_list_delete);
+                profile_list_select = v.findViewById(R.id.profile_list_select);
             }
         }
 
@@ -124,47 +128,48 @@ public class ProfileActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(final ProfileActivity.MyAdapter.MyViewHolder holder, int position) {
 
-            // Display related information onto each profile
-            holder.profile_name.setText(data.get(position).name);
-            holder.profile_text_numOfPlaces.setText("Places to Visit: " + data.get(position).numOfPlaces);
-            holder.profile_text_budget.setText("Budget ($): " + data.get(position).budget);
-            holder.profile_text_time.setText("Time Allowed (Hrs): " + data.get(position).time);
-            // holder.profile_picture.setImageBitmap(data.get(position).icon);
+            // Display related information to each profile
+            holder.profile_list_name.setText(data.get(position).name);
+            holder.profile_list_text_numOfPlaces.setText(data.get(position).numOfPlaces + " Place(s)");
+            holder.profile_list_text_budget.setText(data.get(position).budget);
+
+            if (data.get(position).time.equals("Does Not Matter")) {
+                holder.profile_list_text_time.setText("Does Not Matter");
+            } else {
+                holder.profile_list_text_time.setText(data.get(position).time + " Hour(s)");
+            }
+
+            if (data.get(position).rating.equals("Does Not Matter")) {
+                holder.profile_list_text_rating.setText("Does Not Matter");
+            } else {
+                holder.profile_list_text_rating.setText(data.get(position).rating + " Star(s)");
+            }
+            // holder.profile_list_picture.setImageBitmap(data.get(position).icon);
 
             String tags_description = "Visit: ";
             for (String x :data.get(position).tags) {
                 tags_description += x + ", ";
             }
-            holder.profile_tags.setText(tags_description);
-
-            // Click Listeners
+            holder.profile_list_tags.setText(tags_description);
 
             // It will pass current profile's information into a ProfileCreateActivity
-            holder.profile_edit.setOnClickListener(new View.OnClickListener() {
+            holder.profile_list_edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(ProfileActivity.this, ProfileCreateActivity.class);
                     intent.putExtra("P_edit_name", profiles.get(holder.getAdapterPosition()).name);
                     intent.putStringArrayListExtra("P_edit_tags", profiles.get(holder.getAdapterPosition()).tags);
                     intent.putExtra("P_edit_numOfPlaces", profiles.get(holder.getAdapterPosition()).numOfPlaces);
-
-                    if (profiles.get(holder.getAdapterPosition()).time.equals("Unlimited")) {
-                        intent.putExtra("P_edit_time", "Unlimited");
-                    } else {
-                        intent.putExtra("P_edit_time", profiles.get(holder.getAdapterPosition()).time);
-                    }
-
-                    if (profiles.get(holder.getAdapterPosition()).budget.equals("Unlimited")) {
-                        intent.putExtra("P_edit_budget", "Unlimited");
-                    }
-                    intent.putExtra("P_edit_budget", profiles.get(holder.getAdapterPosition()).budget);
+                    intent.putExtra("P_edit_time", profiles.get(holder.getAdapterPosition()).rawTime);
+                    intent.putExtra("P_edit_budget", profiles.get(holder.getAdapterPosition()).rawBudget);
+                    intent.putExtra("P_edit_rating", profiles.get(holder.getAdapterPosition()).rawRating);
                     intent.putExtra("P_edit_position", holder.getAdapterPosition());
                     startActivityForResult(intent, EDIT_PROFILE);
                 }
             });
 
             // Prompts a warning box about deleting the selected profile
-            holder.profile_delete.setOnClickListener(new View.OnClickListener() {
+            holder.profile_list_delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     AlertDialog.Builder ADbuilder = new AlertDialog.Builder(ProfileActivity.this);
@@ -194,6 +199,13 @@ public class ProfileActivity extends AppCompatActivity {
 
                     AlertDialog alert = ADbuilder.create();
                     alert.show();
+                }
+            });
+
+            holder.profile_list_select.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                   finish(); // TEMPORARY
                 }
             });
         }

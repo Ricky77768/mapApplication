@@ -46,15 +46,15 @@ public class ProfileCreateActivity extends AppCompatActivity {
         final SeekBar profile_create_seekbar_numOfPlaces = findViewById(R.id.profile_create_seekbar_numOfPlaces);
         final SeekBar profile_create_seekbar_budget = findViewById(R.id.profile_create_seekbar_budget);
         final SeekBar profile_create_seekbar_time = findViewById(R.id.profile_create_seekbar_time);
+        final SeekBar profile_create_seekbar_rating = findViewById(R.id.profile_create_seekbar_rating);
         final TextView profile_create_text_numOfPlaces = findViewById(R.id.profile_create_text_numOfPlaces);
         final TextView profile_create_text_budget = findViewById(R.id.profile_create_text_budget);
         final TextView profile_create_text_time = findViewById(R.id.profile_create_text_time);
+        final TextView profile_create_text_rating = findViewById(R.id.profile_create_text_rating);
         final EditText profile_create_profile_name = findViewById(R.id.profile_create_profile_name);
         final Button profile_create_save = findViewById(R.id.profile_create_save);
         final Button profile_create_cancel = findViewById(R.id.profile_create_cancel);
         final ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
-        final CheckBox profile_create_checkbox_time = findViewById(R.id.profile_create_checkbox_time);
-        final CheckBox profile_create_checkbox_budget = findViewById(R.id.profile_create_checkbox_budget);
         final ChipGroup profile_create_chipgroup = findViewById(R.id.profile_create_chipgroup);
 
         // Click Listeners
@@ -77,16 +77,9 @@ public class ProfileCreateActivity extends AppCompatActivity {
                 String numOfPlaces = Integer.toString(profile_create_seekbar_numOfPlaces.getProgress());
                 String budget = Integer.toString(profile_create_seekbar_budget.getProgress());
                 String time = Integer.toString(profile_create_seekbar_time.getProgress());
+                String rating = Integer.toString(profile_create_seekbar_rating.getProgress());
+
                 ArrayList<String> tags = new ArrayList<>();
-
-                // Check if checkboxes are checked, which indicate that parameter does not matter
-                if (profile_create_checkbox_time.isChecked()) {
-                    time = "Unlimited";
-                }
-
-                if (profile_create_checkbox_budget.isChecked()) {
-                    budget = "Unlimited";
-                }
 
                 // Check for tags selected
                 for (int i = 0; i < profile_create_chipgroup.getChildCount(); i++) {
@@ -102,6 +95,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
                 data.putExtra("P_numOfPlaces", numOfPlaces);
                 data.putExtra("P_time",time);
                 data.putExtra("P_budget", budget);
+                data.putExtra("P_rating", rating);
                 data.putStringArrayListExtra("P_tags", tags);
 
                 // If editing a profile, then get the position of the profile in the RecycleView
@@ -131,35 +125,10 @@ public class ProfileCreateActivity extends AppCompatActivity {
             }
         });
 
-        profile_create_checkbox_time.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (buttonView.isChecked()) {
-                    profile_create_seekbar_time.setEnabled(false);
-                    profile_create_text_time.setVisibility(View.INVISIBLE);
-                } else {
-                    profile_create_seekbar_time.setEnabled(true);
-                    profile_create_text_time.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
-        profile_create_checkbox_budget.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (buttonView.isChecked()) {
-                    profile_create_seekbar_budget.setEnabled(false);
-                    profile_create_text_budget.setVisibility(View.INVISIBLE);
-                } else {
-                    profile_create_seekbar_budget.setEnabled(true);
-                    profile_create_text_budget.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
-        createSeekBar(profile_create_seekbar_numOfPlaces, profile_create_text_numOfPlaces, 0, 5);
-        createSeekBar(profile_create_seekbar_budget, profile_create_text_budget, 0, 1000);
-        createSeekBar(profile_create_seekbar_time, profile_create_text_time, 0, 12);
+        createSeekBar(profile_create_seekbar_numOfPlaces, profile_create_text_numOfPlaces, 0, 5, "NumofPlaces");
+        createSeekBar(profile_create_seekbar_budget, profile_create_text_budget, 0, 4, "Budget");
+        createSeekBar(profile_create_seekbar_time, profile_create_text_time, 0, 11, "Time");
+        createSeekBar(profile_create_seekbar_rating, profile_create_text_rating, 0, 50, "Rating");
 
         // Check if this is to edit a existing profile
         Intent intent = getIntent();
@@ -278,18 +247,70 @@ public class ProfileCreateActivity extends AppCompatActivity {
         alert11.show();
     }
 
-    public void createSeekBar(final SeekBar sb, final TextView progressText, final int minValue, int maxValue){
+    public void createSeekBar(final SeekBar sb, final TextView progressText, final int minValue, final int maxValue, final String type){
         sb.setMin(minValue);
         sb.setMax(maxValue);
-        sb.setProgress( (minValue + maxValue) / 2);
+        sb.setProgress(maxValue);
+
+        // Set Default values of seekbars & texts
         progressText.setText(sb.getProgress() + "");
+        if (type.equals("Time")) {
+            progressText.setText("Does Not Matter");
+        }
+
+        if (type.equals("Rating")) {
+            progressText.setText("Does Not Matter");
+            sb.setProgress(0);
+        }
+
+        if (type.equals("Budget")) {
+            progressText.setText("Medium");
+        }
 
         sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                // Default Text change
                 progressText.setText(progress + "");
-            }
+
+                // Seekbar specific change
+                if (type.equals("Time")) {
+                    if (sb.getProgress() == sb.getMax()) {
+                        progressText.setText("Does Not Matter");
+                    }
+                }
+
+                if (type.equals("Budget")) {
+                    switch (sb.getProgress()) {
+                        case 0:
+                            progressText.setText("Minimal");
+                            break;
+                        case 1:
+                            progressText.setText("Small");
+                            break;
+                        case 2:
+                            progressText.setText("Medium");
+                            break;
+                        case 3:
+                            progressText.setText("Large");
+                            break;
+                        case 4:
+                            progressText.setText("Very Large");
+                            break;
+                    }
+                }
+
+                if (type.equals("Rating")) {
+                    progressText.setText(sb.getProgress() / 10.0 + " Star(s)");
+
+                    if (sb.getProgress() <= 10) {
+                        progressText.setText("Does Not Matter");
+                    }
+                }
+
+        }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) { }
@@ -307,26 +328,16 @@ public class ProfileCreateActivity extends AppCompatActivity {
         final SeekBar profile_create_seekbar_numOfPlaces = findViewById(R.id.profile_create_seekbar_numOfPlaces);
         final SeekBar profile_create_seekbar_budget = findViewById(R.id.profile_create_seekbar_budget);
         final SeekBar profile_create_seekbar_time = findViewById(R.id.profile_create_seekbar_time);
+        final SeekBar profile_create_seekbar_rating = findViewById(R.id.profile_create_seekbar_rating);
         final EditText profile_create_profile_name = findViewById(R.id.profile_create_profile_name);
         final ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
-        final CheckBox profile_create_checkbox_time = findViewById(R.id.profile_create_checkbox_time);
-        final CheckBox profile_create_checkbox_budget = findViewById(R.id.profile_create_checkbox_budget);
         final ChipGroup profile_create_chipgroup = findViewById(R.id.profile_create_chipgroup);
 
         profile_create_profile_name.setText(passedData.getStringExtra("P_edit_name"));
         profile_create_seekbar_numOfPlaces.setProgress(Integer.parseInt(passedData.getStringExtra("P_edit_numOfPlaces")));
-
-        if (passedData.getStringExtra("P_edit_time").equals("Unlimited")) {
-            profile_create_checkbox_time.setChecked(true);
-        } else {
-            profile_create_seekbar_time.setProgress(Integer.parseInt(passedData.getStringExtra("P_edit_time")));
-        }
-
-        if (passedData.getStringExtra("P_edit_budget").equals("Unlimited")) {
-            profile_create_checkbox_budget.setChecked(true);
-        } else {
-            profile_create_seekbar_budget.setProgress(Integer.parseInt(passedData.getStringExtra("P_edit_budget")));
-        }
+        profile_create_seekbar_time.setProgress(Integer.parseInt(passedData.getStringExtra("P_edit_time")));
+        profile_create_seekbar_budget.setProgress(Integer.parseInt(passedData.getStringExtra("P_edit_budget")));
+        profile_create_seekbar_rating.setProgress(Integer.parseInt(passedData.getStringExtra("P_edit_rating")));
 
         for (int i = 0; i < profile_create_chipgroup.getChildCount(); i++) {
             View view = profile_create_chipgroup.getChildAt(i);

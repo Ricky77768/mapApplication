@@ -3,30 +3,47 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="200dp">
+    android:layout_height="280dp">
 
     <Button
-        android:id="@+id/profile_edit"
+        android:id="@+id/profile_list_edit"
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         android:text="Edit"
-        app:layout_constraintBottom_toTopOf="@+id/profile_delete"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/profile_list_delete"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/profile_list_select" />
 
     <Button
-        android:id="@+id/profile_delete"
+        android:id="@+id/profile_list_delete"
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:text="Delete"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/profile_list_edit" />
+
+    <Button
+        android:id="@+id/profile_list_select"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Select"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/profile_list_edit"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
-        android:id="@+id/profile_picture"
+        android:id="@+id/profile_list_picture"
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:layout_marginStart="16dp"
@@ -37,57 +54,107 @@
         tools:srcCompat="@mipmap/ic_launcher" />
 
     <TextView
-        android:id="@+id/profile_text_numOfPlaces"
+        android:id="@+id/profile_list_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Number of Places..."
+        android:text="Number of Places |"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_picture" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_list_picture" />
 
     <TextView
-        android:id="@+id/profile_text_budget"
+        android:id="@+id/profile_list_text2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="Budget..."
+        android:text="Budget |"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_text_numOfPlaces" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_list_text" />
 
     <TextView
-        android:id="@+id/profile_text_time"
+        android:id="@+id/profile_list_text3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="Time..."
+        android:text="Time |"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_text_budget" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_list_text2" />
 
     <TextView
-        android:id="@+id/profile_name"
+        android:id="@+id/profile_list_text4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="Minimum Rating |"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profile_list_text3" />
+
+    <TextView
+        android:id="@+id/profile_list_name"
         android:layout_width="0dp"
         android:layout_height="19dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="TextView"
+        android:text="Profile Name"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/profile_picture"
+        app:layout_constraintStart_toEndOf="@+id/profile_list_picture"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/profile_tags"
+        android:id="@+id/profile_list_tags"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="Tags here..."
+        android:text="Wants to Visit"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/profile_picture"
-        app:layout_constraintTop_toBottomOf="@+id/profile_name" />
+        app:layout_constraintStart_toEndOf="@+id/profile_list_picture"
+        app:layout_constraintTop_toBottomOf="@+id/profile_list_name" />
+
+    <TextView
+        android:id="@+id/profile_list_text_numOfPlaces"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="..."
+        app:layout_constraintStart_toEndOf="@+id/profile_list_text"
+        app:layout_constraintTop_toBottomOf="@+id/profile_list_picture" />
+
+    <TextView
+        android:id="@+id/profile_list_text_budget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="..."
+        app:layout_constraintStart_toEndOf="@+id/profile_list_text2"
+        app:layout_constraintTop_toBottomOf="@+id/profile_list_text" />
+
+    <TextView
+        android:id="@+id/profile_list_text_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="..."
+        app:layout_constraintStart_toEndOf="@+id/profile_list_text3"
+        app:layout_constraintTop_toBottomOf="@+id/profile_list_text_budget" />
+
+    <TextView
+        android:id="@+id/profile_list_text_rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="..."
+        app:layout_constraintStart_toEndOf="@+id/profile_list_text4"
+        app:layout_constraintTop_toBottomOf="@+id/profile_list_text_time" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
