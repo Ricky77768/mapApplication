@@ -18,18 +18,30 @@
         app:layout_constraintVertical_bias="1.0"
         tools:context=".MapsActivity" />
 
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_extra_functions"
+        android:id="@+id/fab_settings"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:clickable="true"
         app:fabSize="mini"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/map"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_compass" />
+        app:layout_constraintBottom_toTopOf="@+id/fab_profiles"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_manage" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_profiles"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@+id/fab_search"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_myplaces" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_search"
@@ -42,26 +54,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_menu_search" />
 
-    <Button
-        android:id="@+id/dropdown_profiles"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="Profiles"
-        app:layout_constraintBottom_toTopOf="@+id/fab_extra_functions"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <Button
-        android:id="@+id/dropdown_settings"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="Settings"
-        app:layout_constraintBottom_toTopOf="@+id/dropdown_profiles"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <EditText
         android:id="@+id/input_location"
         android:layout_width="0dp"
@@ -70,7 +62,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:ems="10"
-        android:hint="Enter Location..."
+        android:hint="Pin a Location First"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/fab_search"
@@ -81,7 +73,7 @@
         android:layout_width="0dp"
         android:layout_height="190dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="88dp"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toTopOf="@+id/input_location"
         app:layout_constraintEnd_toEndOf="parent"

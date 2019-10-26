@@ -22,19 +22,29 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         setContentView(R.layout.settings_ui);
         getSupportActionBar().setTitle("Settings");
 
-        Spinner map_type = findViewById(R.id.setting_map_type);
-
+        // Map Type - Spinner
+        Spinner setting_map_type = findViewById(R.id.setting_map_type);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.map_types, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        map_type.setAdapter(adapter);
-        map_type.setOnItemSelectedListener(this);
-        map_type.setSelection(MapsActivity.map.getMapType() - 1);
+        setting_map_type.setAdapter(adapter);
+        setting_map_type.setOnItemSelectedListener(this);
+
+        // Search Radius - Spinner
+        Spinner settings_searching_radius = findViewById(R.id.settings_searching_radius);
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this, R.array.search_radius, android.R.layout.simple_spinner_item);
+        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        settings_searching_radius.setAdapter(adapter2);
+        settings_searching_radius.setOnItemSelectedListener(this);
+
+        // TODO: Remember to change default spinner item based on previous selection
     }
 
     @Override // Switches map type
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        String map_type = parent.getItemAtPosition(position).toString();
-        switch (map_type) {
+        String input = parent.getItemAtPosition(position).toString();
+        switch (input) {
+
+            // Map Type
             case "Roadmap":
                 MapsActivity.map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 break;
@@ -46,6 +56,23 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
                 break;
             case "Hybird":
                 MapsActivity.map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                break;
+
+             // Search Radius
+            case "Very Small (3km)":
+                MapsActivity.radius = 3000;
+                break;
+            case "Small (5km)":
+                MapsActivity.radius = 5000;
+                break;
+            case "Medium (10km)":
+                MapsActivity.radius = 10000;
+                break;
+            case "Large (25km)":
+                MapsActivity.radius = 25000;
+                break;
+            case "Very Large (50km)":
+                MapsActivity.radius = 50000;
                 break;
         }
     }

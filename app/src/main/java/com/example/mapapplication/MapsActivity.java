@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -22,11 +23,18 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     public static GoogleMap map;
+    public static Marker currentMarker;
+    public static Circle currentCircle;
+    public static int radius = 3000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +43,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // References
         RecyclerView location_list = findViewById(R.id.location_list);
-        FloatingActionButton fab_extra_functions = findViewById(R.id.fab_extra_functions);
+        EditText input_location = findViewById(R.id.input_location);
+        final FloatingActionButton fab_settings = findViewById(R.id.fab_settings);
+        final FloatingActionButton fab_profiles = findViewById(R.id.fab_profiles);
         final FloatingActionButton fab_search = findViewById(R.id.fab_search);
-        final Button dropdown_settings = findViewById(R.id.dropdown_settings);
-        final Button dropdown_profiles = findViewById(R.id.dropdown_profiles);
-
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -48,53 +55,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Initialize the map
         mapFragment.getMapAsync(this);
 
-        // Hide certain Views
+        // Modify certain Views
         location_list.setVisibility(View.INVISIBLE);
-        dropdown_profiles.setVisibility(View.INVISIBLE);
-        dropdown_settings.setVisibility(View.INVISIBLE);
+        input_location.setEnabled(false);
+        fab_search.setEnabled(false);
 
         // Click Listeners
-        dropdown_profiles.setOnClickListener(new View.OnClickListener() {
+        fab_profiles.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
                 startActivity(intent);
-                dropdown_profiles.setEnabled(false);
-                dropdown_settings.setEnabled(false);
-                dropdown_profiles.postDelayed(new Runnable() {
+                fab_profiles.setEnabled(false);
+                fab_settings.setEnabled(false);
+                fab_profiles.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        dropdown_profiles.setEnabled(true);
-                        dropdown_settings.setEnabled(true);
+                        fab_profiles.setEnabled(true);
+                        fab_settings.setEnabled(true);
                     }
                 }, 500);
             }
         });
 
-        dropdown_settings.setOnClickListener(new View.OnClickListener() {
+        fab_settings.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(MapsActivity.this, SettingsActivity.class);
                 startActivity(intent);
-                dropdown_profiles.setEnabled(false);
-                dropdown_settings.setEnabled(false);
-                dropdown_profiles.postDelayed(new Runnable() {
+                fab_profiles.setEnabled(false);
+                fab_settings.setEnabled(false);
+                fab_profiles.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        dropdown_profiles.setEnabled(true);
-                        dropdown_settings.setEnabled(true);
+                        fab_profiles.setEnabled(true);
+                        fab_settings.setEnabled(true);
                     }
                 }, 500);
-            }
-        });
-
-        fab_extra_functions.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (dropdown_profiles.getVisibility() == View.VISIBLE) {
-                    dropdown_profiles.setVisibility(View.INVISIBLE);
-                    dropdown_settings.setVisibility(View.INVISIBLE);
-                } else {
-                    dropdown_profiles.setVisibility(View.VISIBLE);
-                    dropdown_settings.setVisibility(View.VISIBLE);
-                }
             }
         });
 
@@ -149,17 +144,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map = googleMap;
         map.setMyLocationEnabled(true);
 
-        // References
-        final Button dropdown_profiles = findViewById(R.id.dropdown_profiles);
-        final Button dropdown_settings = findViewById(R.id.dropdown_settings);
-
         // If extra function buttons are displayed, tapping the map will collapse them
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+
+            // Add a marker and a search radius
             @Override
             public void onMapClick(LatLng latLng) {
-                dropdown_profiles.setVisibility(View.INVISIBLE);
-                dropdown_settings.setVisibility(View.INVISIBLE);
+                if (currentMarker != null) {
+                    currentMarker.remove();
+                }
+                currentMarker = map.addMarker(new MarkerOptions().position(latLng));
+
+                if (currentCircle != null) {
+                    currentCircle.remove();
+                }
+                currentCircle = map.addCircle(new CircleOptions().center(latLng).radius(radius).strokeColor(Color.parseColor("#44A6C6")).strokeWidth(3).fillColor(0x220000FF));
+
+                // Change text on input box and enables it along with search button
+                EditText input_location = findViewById(R.id.input_location);
+                FloatingActionButton fab_search = findViewById(R.id.fab_search);
+                input_location.setEnabled(true);
+                fab_search.setEnabled(true);
+                input_location.setHint("Enter a Search Location...");
             }
+
         });
 
         // Acquire a reference to the system Location Manager
