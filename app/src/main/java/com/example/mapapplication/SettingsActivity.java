@@ -2,7 +2,6 @@ package com.example.mapapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -11,10 +10,7 @@ import android.widget.Spinner;
 
 import com.google.android.gms.maps.GoogleMap;
 
-import java.util.Map;
-
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-    static int map_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,23 +19,33 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         getSupportActionBar().setTitle("Settings");
 
         // Map Type - Spinner
-        Spinner setting_map_type = findViewById(R.id.setting_map_type);
+        Spinner setting_map_type = findViewById(R.id.settings_map_type);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.map_types, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         setting_map_type.setAdapter(adapter);
         setting_map_type.setOnItemSelectedListener(this);
+        setting_map_type.setSelection(MapsActivity.map.getMapType() - 1);
 
         // Search Radius - Spinner
-        Spinner settings_searching_radius = findViewById(R.id.settings_searching_radius);
+        Spinner settings_search_radius = findViewById(R.id.settings_search_radius);
         ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this, R.array.search_radius, android.R.layout.simple_spinner_item);
         adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        settings_searching_radius.setAdapter(adapter2);
-        settings_searching_radius.setOnItemSelectedListener(this);
-
-        // TODO: Remember to change default spinner item based on previous selection
+        settings_search_radius.setAdapter(adapter2);
+        settings_search_radius.setOnItemSelectedListener(this);
+        switch (MapsActivity.searchRadius) {
+            case 10000:
+                settings_search_radius.setSelection(0);
+                break;
+            case 25000:
+                settings_search_radius.setSelection(1);
+                break;
+            case 50000:
+                settings_search_radius.setSelection(2);
+                break;
+        }
     }
 
-    @Override // Switches map type
+    @Override // Switches map type/search radius
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String input = parent.getItemAtPosition(position).toString();
         switch (input) {
@@ -59,20 +65,17 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
                 break;
 
              // Search Radius
-            case "Very Small (3km)":
-                MapsActivity.radius = 3000;
+            case "Small (10km)":
+                MapsActivity.searchRadius = 10000;
+                MapsActivity.changeRadius();
                 break;
-            case "Small (5km)":
-                MapsActivity.radius = 5000;
+            case "Medium (25km)":
+                MapsActivity.searchRadius = 25000;
+                MapsActivity.changeRadius();
                 break;
-            case "Medium (10km)":
-                MapsActivity.radius = 10000;
-                break;
-            case "Large (25km)":
-                MapsActivity.radius = 25000;
-                break;
-            case "Very Large (50km)":
-                MapsActivity.radius = 50000;
+            case "Large (50km)":
+                MapsActivity.searchRadius = 50000;
+                MapsActivity.changeRadius();
                 break;
         }
     }

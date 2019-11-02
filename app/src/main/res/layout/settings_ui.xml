@@ -16,6 +16,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Spinner
+        android:id="@+id/settings_map_type"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="120dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/settings_text"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/settings_text2"
         android:layout_width="wrap_content"
@@ -27,18 +38,7 @@
         app:layout_constraintTop_toBottomOf="@+id/settings_text" />
 
     <Spinner
-        android:id="@+id/setting_map_type"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="120dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/settings_text"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Spinner
-        android:id="@+id/settings_searching_radius"
+        android:id="@+id/settings_search_radius"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -46,6 +46,6 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/settings_text2"
-        app:layout_constraintTop_toBottomOf="@+id/setting_map_type" />
+        app:layout_constraintTop_toBottomOf="@+id/settings_map_type" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

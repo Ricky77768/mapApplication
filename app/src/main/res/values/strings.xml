@@ -26,11 +26,9 @@
     </string-array>
 
     <string-array name="search_radius">
-        <item>Very Small (3km)</item>
-        <item>Small (5km)</item>
-        <item>Medium (10km)</item>
-        <item>Large (25km)</item>
-        <item>Very Large (50km)</item>
+        <item>Small (10km)</item>
+        <item>Medium (25km)</item>
+        <item>Large (50km)</item>
     </string-array>
 
 </resources>

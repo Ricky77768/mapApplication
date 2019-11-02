@@ -1,10 +1,12 @@
 package com.example.mapapplication;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
@@ -34,7 +36,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static GoogleMap map;
     public static Marker currentMarker;
     public static Circle currentCircle;
-    public static int radius = 3000;
+    public static CircleOptions circle;
+    public static int searchRadius = 10000;
+
+    public String searchURL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         EditText input_location = findViewById(R.id.input_location);
         final FloatingActionButton fab_settings = findViewById(R.id.fab_settings);
         final FloatingActionButton fab_profiles = findViewById(R.id.fab_profiles);
+        final FloatingActionButton fab_help = findViewById(R.id.fab_help);
         final FloatingActionButton fab_search = findViewById(R.id.fab_search);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -57,8 +63,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Modify certain Views
         location_list.setVisibility(View.INVISIBLE);
-        input_location.setEnabled(false);
-        fab_search.setEnabled(false);
 
         // Click Listeners
         fab_profiles.setOnClickListener(new View.OnClickListener() {
@@ -67,11 +71,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(intent);
                 fab_profiles.setEnabled(false);
                 fab_settings.setEnabled(false);
+                fab_help.setEnabled(false);
                 fab_profiles.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         fab_profiles.setEnabled(true);
                         fab_settings.setEnabled(true);
+                        fab_help.setEnabled(true);
                     }
                 }, 500);
             }
@@ -83,39 +89,83 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(intent);
                 fab_profiles.setEnabled(false);
                 fab_settings.setEnabled(false);
+                fab_help.setEnabled(false);
                 fab_profiles.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         fab_profiles.setEnabled(true);
                         fab_settings.setEnabled(true);
+                        fab_help.setEnabled(true);
                     }
                 }, 500);
+            }
+        });
+
+        fab_help.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                AlertDialog.Builder ADbuilder = new AlertDialog.Builder(MapsActivity.this);
+                ADbuilder.setMessage("Drop a pin at a location to conduct a nearby search.");
+                ADbuilder.setCancelable(true);
+
+                ADbuilder.setPositiveButton(
+                        "Close",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert = ADbuilder.create();
+                alert.show();
+
+                fab_profiles.setEnabled(false);
+                fab_settings.setEnabled(false);
+                fab_help.setEnabled(false);
+                fab_profiles.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        fab_profiles.setEnabled(true);
+                        fab_settings.setEnabled(true);
+                        fab_help.setEnabled(true);
+                    }
+                }, 500);
+
             }
         });
 
         fab_search.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // TEMPORARY CODE
-                LocationInfo[] test = new LocationInfo[5];
+                LocationInfo[] test = new LocationInfo[3];
                 test[0] = new LocationInfo();
                 test[1] = new LocationInfo();
                 test[2] = new LocationInfo();
-                test[3] = new LocationInfo();
-                test[4] = new LocationInfo();
                 // TEMPORARY CODE
-
                 RecyclerView location_list = findViewById(R.id.location_list);
-                EditText input_location = findViewById(R.id.input_location);
-                location_list.setVisibility(View.VISIBLE);
-                location_list.setHasFixedSize(false);
 
-                // Create LayoutManager
-                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-                location_list.setLayoutManager(mLayoutManager);
+                if (location_list.getVisibility() == View.INVISIBLE) {
+                    location_list.setVisibility(View.VISIBLE);
+                    fab_search.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
 
-                // Create/Specify Adapters
-                RecyclerView.Adapter mAdapter = new MyAdapter(test, input_location.getText().toString());
-                location_list.setAdapter(mAdapter);
+                    EditText input_location = findViewById(R.id.input_location);
+                    location_list.setVisibility(View.VISIBLE);
+                    location_list.setHasFixedSize(false);
+
+                    // Create LayoutManager
+                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+                    location_list.setLayoutManager(mLayoutManager);
+
+                    // Create/Specify Adapters
+                    RecyclerView.Adapter mAdapter = new MyAdapter(test, input_location.getText().toString());
+                    location_list.setAdapter(mAdapter);
+
+                    // Start file download
+
+                } else {
+                    location_list.setVisibility(View.INVISIBLE);
+                    fab_search.setImageResource(android.R.drawable.ic_menu_search);
+                }
+
             }
         });
     }
@@ -143,6 +193,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         map.setMyLocationEnabled(true);
+        circle = new CircleOptions()
+                .radius(searchRadius)
+                .strokeColor(Color.BLACK)
+                .fillColor(0x220000FF)
+                .strokeWidth(2);
 
         // If extra function buttons are displayed, tapping the map will collapse them
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -153,21 +208,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (currentMarker != null) {
                     currentMarker.remove();
                 }
-                currentMarker = map.addMarker(new MarkerOptions().position(latLng));
-
                 if (currentCircle != null) {
                     currentCircle.remove();
                 }
-                currentCircle = map.addCircle(new CircleOptions().center(latLng).radius(radius).strokeColor(Color.parseColor("#44A6C6")).strokeWidth(3).fillColor(0x220000FF));
 
-                // Change text on input box and enables it along with search button
-                EditText input_location = findViewById(R.id.input_location);
-                FloatingActionButton fab_search = findViewById(R.id.fab_search);
-                input_location.setEnabled(true);
-                fab_search.setEnabled(true);
-                input_location.setHint("Enter a Search Location...");
+                circle.center(latLng);
+                circle.radius(searchRadius);
+                currentCircle = map.addCircle(circle);
+                currentMarker = map.addMarker(new MarkerOptions().position(latLng));
+                currentMarker.setDraggable(true);
+            }
+        });
+
+        map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+                currentCircle.remove();
             }
 
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                circle.center(marker.getPosition());
+                currentCircle = map.addCircle(circle);
+            }
+
+            @Override
+            public void onMarkerDrag(Marker marker) {}
         });
 
         // Acquire a reference to the system Location Manager
@@ -187,7 +253,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Move and zoom the camera to current location
         Location location = locationManager.getLastKnownLocation(locationProvider);
         LatLng userLocation = new LatLng(location.getLatitude(),location.getLongitude());
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation,15));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation,10));
     }
 
     // Adapter for RecycleView
@@ -238,4 +304,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return sample.length;
         }
     }
+
+    // Change circle that indicates search radius
+    public static void changeRadius() {
+        circle.radius(searchRadius);
+        if (currentCircle != null) {
+            currentCircle.remove();
+            currentCircle = map.addCircle(circle);
+        }
+    }
+
 }
