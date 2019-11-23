@@ -1,17 +1,22 @@
 package com.example.mapapplication;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 public class LocationInfo {
-    String name, description;
+    String name, address, lat, lng;
+    LatLng position;
+    MarkerOptions markerOption;
 
-    // TEMPORARY CODE
-    public LocationInfo() {
-        sampleText();
-    }
+    public LocationInfo(String[] data) {
+        name = data[0];
+        address = data[1];
+        lat = data[2];
+        lng = data[3];
 
-    public void sampleText() {
-        name = "Item ";
-        description = "You have entered: ";
+        position = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
+        markerOption = new MarkerOptions().position(position);
+        MapsActivity.singleSearchMarker = MapsActivity.map.addMarker(markerOption);
     }
-    // TEMPORARY CODE
 
 }

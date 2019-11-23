@@ -12,7 +12,10 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,14 +35,29 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     public static GoogleMap map;
     public static Marker currentMarker;
+    public static Marker singleSearchMarker;
+    public static Marker[] nearbySearchMarkers;
     public static Circle currentCircle;
     public static CircleOptions circle;
+    public static String searchURL;
     public static int searchRadius = 10000;
-
-    public String searchURL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +65,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.app_ui);
 
         // References
-        RecyclerView location_list = findViewById(R.id.location_list);
-        EditText input_location = findViewById(R.id.input_location);
+        final RecyclerView location_list = findViewById(R.id.location_list);
+        final EditText input_location = findViewById(R.id.input_location);
         final FloatingActionButton fab_settings = findViewById(R.id.fab_settings);
         final FloatingActionButton fab_profiles = findViewById(R.id.fab_profiles);
         final FloatingActionButton fab_help = findViewById(R.id.fab_help);
@@ -135,34 +153,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         fab_search.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // TEMPORARY CODE
-                LocationInfo[] test = new LocationInfo[3];
-                test[0] = new LocationInfo();
-                test[1] = new LocationInfo();
-                test[2] = new LocationInfo();
-                // TEMPORARY CODE
-                RecyclerView location_list = findViewById(R.id.location_list);
+
+                // Replace spaces in search input with %20 to support spaces in search term
+                String search_result = input_location.getText().toString();
+                search_result = search_result.trim();
+                search_result = search_result.replaceAll("\\s", "%20");
+
+                searchURL = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=";
+                searchURL += search_result;
+                searchURL += "&inputtype=textquery&fields=photos,formatted_address,name,rating,opening_hours,geometry&key=";
+                searchURL += getString(R.string.google_maps_key);
 
                 if (location_list.getVisibility() == View.INVISIBLE) {
-                    location_list.setVisibility(View.VISIBLE);
-                    fab_search.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
 
-                    EditText input_location = findViewById(R.id.input_location);
-                    location_list.setVisibility(View.VISIBLE);
+                    // Start file download
+                    DownloadLocation downloadLocation = new DownloadLocation();
+                    downloadLocation.execute(searchURL);
+                    fab_search.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
                     location_list.setHasFixedSize(false);
 
                     // Create LayoutManager
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
                     location_list.setLayoutManager(mLayoutManager);
 
-                    // Create/Specify Adapters
-                    RecyclerView.Adapter mAdapter = new MyAdapter(test, input_location.getText().toString());
-                    location_list.setAdapter(mAdapter);
-
-                    // Start file download
-
                 } else {
                     location_list.setVisibility(View.INVISIBLE);
+                    singleSearchMarker.remove();
                     fab_search.setImageResource(android.R.drawable.ic_menu_search);
                 }
 
@@ -174,8 +190,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // If RecycleView is open, close it instead. Else, close the app.
     public void onBackPressed() {
         RecyclerView location_list = findViewById(R.id.location_list);
+        FloatingActionButton fab_search = findViewById(R.id.fab_search);
         if (location_list.getVisibility() == View.VISIBLE) {
+            singleSearchMarker.remove();
             location_list.setVisibility(View.INVISIBLE);
+            fab_search.setImageResource(android.R.drawable.ic_menu_search);
         } else {
             super.onBackPressed();
         }
@@ -193,6 +212,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         map.setMyLocationEnabled(true);
+        map.getUiSettings().setMapToolbarEnabled(false);
         circle = new CircleOptions()
                 .radius(searchRadius)
                 .strokeColor(Color.BLACK)
@@ -258,8 +278,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Adapter for RecycleView
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-        private LocationInfo[] sample;
-        private String userInput;
+        private LocationInfo[] dataSet;
 
         // Provide a reference to the views for each data item
         // Complex data items may need more than one view per item, and
@@ -278,9 +297,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         // Provide data to initialize
-        public MyAdapter(LocationInfo[] myDataset, String input) {
-            sample = myDataset;
-            userInput = input;
+        public MyAdapter(LocationInfo[] myDataset) {
+            dataSet = myDataset;
         }
 
         // Create new View (by Layout Manager)
@@ -294,15 +312,130 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Replace a View (by Layout Manager) (position is the current index of dataset based on which View)
         @Override
         public void onBindViewHolder(MyViewHolder holder, int position) {
-            holder.location_name.setText(sample[position].name + position);
-            holder.location_otherinfo.setText(sample[position].description + userInput);
+            holder.location_name.setText(dataSet[position].name);
+            holder.location_otherinfo.setText(dataSet[position].address);
             holder.location_picture.setImageResource(R.drawable.ic_launcher_background);
         }
 
         @Override
         public int getItemCount() {
-            return sample.length;
+            return dataSet.length;
         }
+    }
+
+    // File Download
+    private class DownloadLocation extends AsyncTask<String, Integer, String> {
+        protected String doInBackground (String... urls) {
+            int count = 0;
+            try {
+                URL url = new URL(urls[0].toString());
+                URLConnection connection = url.openConnection();
+                connection.connect();
+
+                // Useful for progress bar
+                int lengthOfFile = connection.getContentLength();
+
+                // Download file from URL(s)
+                InputStream input = new BufferedInputStream(url.openStream(),
+                        8192);
+
+                // Output stream
+                OutputStream output = new FileOutputStream(Environment
+                        .getExternalStorageDirectory().toString()
+                        + "/single_location_search.json", false);
+
+                byte[] data = new byte[1024];
+                long total = 0;
+
+                while ((count = input.read(data)) != -1) {
+
+                    // Publishing the progress. After this onProgressUpdate will be called
+                    publishProgress(0);
+
+                    // Write data to the file
+                    output.write(data, 0, count);
+                }
+
+                // Flushing output and Closing streams
+                output.flush();
+                output.close();
+                input.close();
+
+            } catch (Exception e) {}
+            return null;
+        }
+        @Override
+        protected void onPreExecute() {}
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {}
+
+        @Override
+        protected void onPostExecute(String s) {
+            try {
+                parseSingleLocation();
+            } catch (Exception e) {}
+        }
+
+    }
+
+    // Function to parse single location search data
+    public void parseSingleLocation() throws Exception {
+        String name, address, lat, lng;
+        RecyclerView location_list = findViewById(R.id.location_list);
+
+        // Convert file to JSON String
+        File dir = Environment.getExternalStorageDirectory();
+        String path = dir.getAbsolutePath();
+        File data = new File(path + "/single_location_search.json");
+        FileInputStream iStream = new FileInputStream(data);
+        String info = convertStreamToString(iStream);
+        iStream.close();
+
+        JSONObject reader = new JSONObject(info);
+        if (reader.getString("status").equals("OK")) {
+            JSONArray candidatesArr = reader.getJSONArray("candidates");
+            JSONObject candidates = candidatesArr.getJSONObject(0);
+            JSONObject geometry = candidates.getJSONObject("geometry");
+            JSONObject location = geometry.getJSONObject("location");
+
+            name = candidates.getString("name");
+            address = candidates.getString("formatted_address");
+            lat = String.valueOf(location.getDouble("lat"));
+            lng = String.valueOf(location.getDouble("lng"));
+
+        } else {
+            name = "ERROR - " + reader.getString("status");
+            address = "ERROR - " + reader.getString("status");
+            lat = "ERROR - " + reader.getString("status");
+            lng = "ERROR - " + reader.getString("status");
+        }
+
+        String[] fields = new String[4];
+        fields[0] = name;
+        fields[1] = address;
+        fields[2] = lat;
+        fields[3] = lng;
+
+        LocationInfo[] singleSearch = new LocationInfo[1];
+        singleSearch[0] = new LocationInfo(fields);
+
+        // Create/Specify Adapters
+        RecyclerView.Adapter mAdapter = new MyAdapter(singleSearch);
+        location_list.setAdapter(mAdapter);
+        location_list.setVisibility(View.VISIBLE);
+    }
+
+    // Function to convert file to a String
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line).append("\n");
+        }
+        reader.close();
+        return sb.toString();
     }
 
     // Change circle that indicates search radius
