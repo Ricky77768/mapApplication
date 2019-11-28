@@ -20,8 +20,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -51,7 +53,7 @@ import java.net.URLConnection;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     public static GoogleMap map;
-    public static Marker currentMarker;
+    public static Marker searchCenter;
     public static Marker singleSearchMarker;
     public static Marker[] nearbySearchMarkers;
     public static Circle currentCircle;
@@ -65,11 +67,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.app_ui);
 
         // References
+        final Switch nearby_search_switch = findViewById(R.id.nearby_search_switch);
         final RecyclerView location_list = findViewById(R.id.location_list);
         final EditText input_location = findViewById(R.id.input_location);
         final FloatingActionButton fab_settings = findViewById(R.id.fab_settings);
         final FloatingActionButton fab_profiles = findViewById(R.id.fab_profiles);
-        final FloatingActionButton fab_help = findViewById(R.id.fab_help);
         final FloatingActionButton fab_search = findViewById(R.id.fab_search);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -89,13 +91,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(intent);
                 fab_profiles.setEnabled(false);
                 fab_settings.setEnabled(false);
-                fab_help.setEnabled(false);
                 fab_profiles.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         fab_profiles.setEnabled(true);
                         fab_settings.setEnabled(true);
-                        fab_help.setEnabled(true);
                     }
                 }, 500);
             }
@@ -107,47 +107,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(intent);
                 fab_profiles.setEnabled(false);
                 fab_settings.setEnabled(false);
-                fab_help.setEnabled(false);
                 fab_profiles.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         fab_profiles.setEnabled(true);
                         fab_settings.setEnabled(true);
-                        fab_help.setEnabled(true);
                     }
                 }, 500);
-            }
-        });
-
-        fab_help.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                AlertDialog.Builder ADbuilder = new AlertDialog.Builder(MapsActivity.this);
-                ADbuilder.setMessage("Drop a pin at a location to conduct a nearby search.");
-                ADbuilder.setCancelable(true);
-
-                ADbuilder.setPositiveButton(
-                        "Close",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-
-                AlertDialog alert = ADbuilder.create();
-                alert.show();
-
-                fab_profiles.setEnabled(false);
-                fab_settings.setEnabled(false);
-                fab_help.setEnabled(false);
-                fab_profiles.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        fab_profiles.setEnabled(true);
-                        fab_settings.setEnabled(true);
-                        fab_help.setEnabled(true);
-                    }
-                }, 500);
-
             }
         });
 
@@ -184,6 +150,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+
+        nearby_search_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (searchCenter == null) {
+                        AlertDialog.Builder ADbuilder = new AlertDialog.Builder(MapsActivity.this);
+                        ADbuilder.setMessage("Drop a pin at a location to conduct a nearby search.");
+                        ADbuilder.setCancelable(true);
+
+                        ADbuilder.setPositiveButton(
+                                "Close",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                        AlertDialog alert = ADbuilder.create();
+                        alert.show();
+
+                        nearby_search_switch.setChecked(false);
+                    }
+
+                } else { }
+            }
+        });
+
     }
 
     @Override
@@ -225,8 +218,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Add a marker and a search radius
             @Override
             public void onMapClick(LatLng latLng) {
-                if (currentMarker != null) {
-                    currentMarker.remove();
+                if (searchCenter != null) {
+                    searchCenter.remove();
                 }
                 if (currentCircle != null) {
                     currentCircle.remove();
@@ -235,8 +228,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 circle.center(latLng);
                 circle.radius(searchRadius);
                 currentCircle = map.addCircle(circle);
-                currentMarker = map.addMarker(new MarkerOptions().position(latLng));
-                currentMarker.setDraggable(true);
+                searchCenter = map.addMarker(new MarkerOptions().position(latLng));
+                searchCenter.setDraggable(true);
             }
         });
 
@@ -374,7 +367,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         protected void onPostExecute(String s) {
             try {
                 parseSingleLocation();
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                Log.e("Ricky", "exception", e);
+            }
         }
 
     }
@@ -383,6 +378,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void parseSingleLocation() throws Exception {
         String name, address, lat, lng;
         RecyclerView location_list = findViewById(R.id.location_list);
+        FloatingActionButton fab_search = findViewById(R.id.fab_search);
 
         // Convert file to JSON String
         File dir = Environment.getExternalStorageDirectory();
@@ -404,26 +400,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             lat = String.valueOf(location.getDouble("lat"));
             lng = String.valueOf(location.getDouble("lng"));
 
+            String[] fields = new String[4];
+            fields[0] = name;
+            fields[1] = address;
+            fields[2] = lat;
+            fields[3] = lng;
+
+            LocationInfo[] singleSearch = new LocationInfo[1];
+            singleSearch[0] = new LocationInfo(fields);
+
+            // Create/Specify Adapters
+            RecyclerView.Adapter mAdapter = new MyAdapter(singleSearch);
+            location_list.setAdapter(mAdapter);
+            location_list.setVisibility(View.VISIBLE);
         } else {
-            name = "ERROR - " + reader.getString("status");
-            address = "ERROR - " + reader.getString("status");
-            lat = "ERROR - " + reader.getString("status");
-            lng = "ERROR - " + reader.getString("status");
+            fab_search.setImageResource(android.R.drawable.ic_menu_search);
+            AlertDialog.Builder ADbuilder = new AlertDialog.Builder(MapsActivity.this);
+            ADbuilder.setMessage("An Error Occured (" + reader.getString("status") + ")");
+            ADbuilder.setCancelable(true);
+
+            ADbuilder.setPositiveButton(
+                    "Close",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alert = ADbuilder.create();
+            alert.show();
         }
-
-        String[] fields = new String[4];
-        fields[0] = name;
-        fields[1] = address;
-        fields[2] = lat;
-        fields[3] = lng;
-
-        LocationInfo[] singleSearch = new LocationInfo[1];
-        singleSearch[0] = new LocationInfo(fields);
-
-        // Create/Specify Adapters
-        RecyclerView.Adapter mAdapter = new MyAdapter(singleSearch);
-        location_list.setAdapter(mAdapter);
-        location_list.setVisibility(View.VISIBLE);
     }
 
     // Function to convert file to a String

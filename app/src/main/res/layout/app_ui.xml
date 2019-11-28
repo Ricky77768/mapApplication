@@ -39,21 +39,9 @@
         android:layout_marginBottom="16dp"
         android:clickable="true"
         app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@+id/fab_search"
+        app:layout_constraintBottom_toTopOf="@+id/nearby_search_switch"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_menu_myplaces" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_help"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:clickable="true"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@+id/fab_settings"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_help" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_search"
@@ -85,11 +73,21 @@
         android:layout_width="0dp"
         android:layout_height="190dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="88dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toTopOf="@+id/input_location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Switch
+        android:id="@+id/nearby_search_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Search Near Pin"
+        app:layout_constraintBottom_toTopOf="@+id/location_list"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
