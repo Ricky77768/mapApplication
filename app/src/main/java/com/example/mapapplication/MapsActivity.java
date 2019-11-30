@@ -30,6 +30,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -50,16 +51,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     public static GoogleMap map;
     public static Marker searchCenter;
     public static Marker singleSearchMarker;
-    public static Marker[] nearbySearchMarkers;
-    public static Circle currentCircle;
-    public static CircleOptions circle;
     public static String searchURL;
-    public static int searchRadius = 10000;
+    public static ArrayList<Marker> searchMarkers = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,11 +66,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.app_ui);
 
         // References
-        final Switch nearby_search_switch = findViewById(R.id.nearby_search_switch);
         final RecyclerView location_list = findViewById(R.id.location_list);
         final EditText input_location = findViewById(R.id.input_location);
         final FloatingActionButton fab_settings = findViewById(R.id.fab_settings);
         final FloatingActionButton fab_profiles = findViewById(R.id.fab_profiles);
+        final FloatingActionButton fab_help = findViewById(R.id.fab_help);
+        final FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
         final FloatingActionButton fab_search = findViewById(R.id.fab_search);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -83,6 +83,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Modify certain Views
         location_list.setVisibility(View.INVISIBLE);
+        fab_marker_delete.setVisibility(View.INVISIBLE);
 
         // Click Listeners
         fab_profiles.setOnClickListener(new View.OnClickListener() {
@@ -91,11 +92,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(intent);
                 fab_profiles.setEnabled(false);
                 fab_settings.setEnabled(false);
+                fab_help.setEnabled(false);
                 fab_profiles.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         fab_profiles.setEnabled(true);
                         fab_settings.setEnabled(true);
+                        fab_help.setEnabled(true);
                     }
                 }, 500);
             }
@@ -107,28 +110,82 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(intent);
                 fab_profiles.setEnabled(false);
                 fab_settings.setEnabled(false);
+                fab_help.setEnabled(false);
                 fab_profiles.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         fab_profiles.setEnabled(true);
                         fab_settings.setEnabled(true);
+                        fab_help.setEnabled(true);
                     }
                 }, 500);
             }
         });
 
+        fab_help.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                fab_profiles.setEnabled(false);
+                fab_settings.setEnabled(false);
+                fab_help.setEnabled(false);
+                fab_profiles.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        fab_profiles.setEnabled(true);
+                        fab_settings.setEnabled(true);
+                        fab_help.setEnabled(true);
+                    }
+                }, 500);
+
+                AlertDialog.Builder ADbuilder = new AlertDialog.Builder(MapsActivity.this);
+                ADbuilder.setMessage("Tap anywhere on a map to get search results nearby the dropped pin (if there are any). You can drag the marker around, and delete it using the garbage can button");
+                ADbuilder.setCancelable(true);
+
+                ADbuilder.setPositiveButton(
+                        "Ok",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert = ADbuilder.create();
+                alert.show();
+            }
+        });
+
+        fab_marker_delete.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                searchCenter.remove();
+                searchCenter = null;
+                fab_marker_delete.setVisibility(View.INVISIBLE);
+            }
+        });
+
         fab_search.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                fab_search.setEnabled(false);
+                fab_search.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        fab_search.setEnabled(true);
+                    }
+                }, 500);
 
                 // Replace spaces in search input with %20 to support spaces in search term
                 String search_result = input_location.getText().toString();
                 search_result = search_result.trim();
                 search_result = search_result.replaceAll("\\s", "%20");
 
-                searchURL = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=";
+                // Create Search URL
+                searchURL = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=";
                 searchURL += search_result;
-                searchURL += "&inputtype=textquery&fields=photos,formatted_address,name,rating,opening_hours,geometry&key=";
-                searchURL += getString(R.string.google_maps_key);
+                if (searchCenter == null) {
+                    // Dummy Location (In the middle of nowhere)
+                    searchURL += "&location=35,-170";
+                } else {
+                    searchURL += "&location=" + searchCenter.getPosition().latitude + "," + searchCenter.getPosition().longitude;
+                }
+                searchURL += "&radius=50000&key=" + getString(R.string.google_maps_key);
 
                 if (location_list.getVisibility() == View.INVISIBLE) {
 
@@ -144,36 +201,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 } else {
                     location_list.setVisibility(View.INVISIBLE);
-                    singleSearchMarker.remove();
                     fab_search.setImageResource(android.R.drawable.ic_menu_search);
+                    for (Marker x : searchMarkers) {
+                        x.remove();
+                    }
+                    searchMarkers = new ArrayList<>();
                 }
 
-            }
-        });
-
-        nearby_search_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    if (searchCenter == null) {
-                        AlertDialog.Builder ADbuilder = new AlertDialog.Builder(MapsActivity.this);
-                        ADbuilder.setMessage("Drop a pin at a location to conduct a nearby search.");
-                        ADbuilder.setCancelable(true);
-
-                        ADbuilder.setPositiveButton(
-                                "Close",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.cancel();
-                                    }
-                                });
-
-                        AlertDialog alert = ADbuilder.create();
-                        alert.show();
-
-                        nearby_search_switch.setChecked(false);
-                    }
-
-                } else { }
             }
         });
 
@@ -185,9 +219,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         RecyclerView location_list = findViewById(R.id.location_list);
         FloatingActionButton fab_search = findViewById(R.id.fab_search);
         if (location_list.getVisibility() == View.VISIBLE) {
-            singleSearchMarker.remove();
             location_list.setVisibility(View.INVISIBLE);
             fab_search.setImageResource(android.R.drawable.ic_menu_search);
+            for (Marker x : searchMarkers) {
+                x.remove();
+            }
+            searchMarkers = new ArrayList<>();
         } else {
             super.onBackPressed();
         }
@@ -206,13 +243,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map = googleMap;
         map.setMyLocationEnabled(true);
         map.getUiSettings().setMapToolbarEnabled(false);
-        circle = new CircleOptions()
-                .radius(searchRadius)
-                .strokeColor(Color.BLACK)
-                .fillColor(0x220000FF)
-                .strokeWidth(2);
+        final FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
 
-        // If extra function buttons are displayed, tapping the map will collapse them
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             // Add a marker and a search radius
@@ -221,32 +253,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (searchCenter != null) {
                     searchCenter.remove();
                 }
-                if (currentCircle != null) {
-                    currentCircle.remove();
-                }
-
-                circle.center(latLng);
-                circle.radius(searchRadius);
-                currentCircle = map.addCircle(circle);
-                searchCenter = map.addMarker(new MarkerOptions().position(latLng));
+                searchCenter = map.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                 searchCenter.setDraggable(true);
+                fab_marker_delete.setVisibility(View.VISIBLE);
             }
         });
 
         map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
-            public void onMarkerDragStart(Marker marker) {
-                currentCircle.remove();
-            }
+            public void onMarkerDragStart(Marker marker) { }
 
             @Override
-            public void onMarkerDragEnd(Marker marker) {
-                circle.center(marker.getPosition());
-                currentCircle = map.addCircle(circle);
-            }
+            public void onMarkerDrag(Marker marker) { }
 
             @Override
-            public void onMarkerDrag(Marker marker) {}
+            public void onMarkerDragEnd(Marker marker) { }
         });
 
         // Acquire a reference to the system Location Manager
@@ -271,7 +292,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Adapter for RecycleView
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-        private LocationInfo[] dataSet;
+        private ArrayList<LocationInfo> dataSet;
 
         // Provide a reference to the views for each data item
         // Complex data items may need more than one view per item, and
@@ -290,7 +311,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         // Provide data to initialize
-        public MyAdapter(LocationInfo[] myDataset) {
+        public MyAdapter(ArrayList<LocationInfo> myDataset) {
             dataSet = myDataset;
         }
 
@@ -305,14 +326,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Replace a View (by Layout Manager) (position is the current index of dataset based on which View)
         @Override
         public void onBindViewHolder(MyViewHolder holder, int position) {
-            holder.location_name.setText(dataSet[position].name);
-            holder.location_otherinfo.setText(dataSet[position].address);
+            holder.location_name.setText(dataSet.get(position).name);
+            holder.location_otherinfo.setText(dataSet.get(position).address);
             holder.location_picture.setImageResource(R.drawable.ic_launcher_background);
         }
 
         @Override
         public int getItemCount() {
-            return dataSet.length;
+            return dataSet.size();
         }
     }
 
@@ -335,7 +356,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Output stream
                 OutputStream output = new FileOutputStream(Environment
                         .getExternalStorageDirectory().toString()
-                        + "/single_location_search.json", false);
+                        + "/search_data.json", false);
 
                 byte[] data = new byte[1024];
                 long total = 0;
@@ -366,16 +387,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(String s) {
             try {
-                parseSingleLocation();
+                parseInfo();
             } catch (Exception e) {
-                Log.e("Ricky", "exception", e);
+                Log.e("Ricky", e.getMessage());
             }
         }
 
     }
 
     // Function to parse single location search data
-    public void parseSingleLocation() throws Exception {
+    public void parseInfo() throws Exception {
         String name, address, lat, lng;
         RecyclerView location_list = findViewById(R.id.location_list);
         FloatingActionButton fab_search = findViewById(R.id.fab_search);
@@ -383,34 +404,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Convert file to JSON String
         File dir = Environment.getExternalStorageDirectory();
         String path = dir.getAbsolutePath();
-        File data = new File(path + "/single_location_search.json");
+        File data = new File(path + "/search_data.json");
         FileInputStream iStream = new FileInputStream(data);
         String info = convertStreamToString(iStream);
         iStream.close();
 
         JSONObject reader = new JSONObject(info);
+        ArrayList<LocationInfo> searchData = new ArrayList<>();
         if (reader.getString("status").equals("OK")) {
-            JSONArray candidatesArr = reader.getJSONArray("candidates");
-            JSONObject candidates = candidatesArr.getJSONObject(0);
-            JSONObject geometry = candidates.getJSONObject("geometry");
-            JSONObject location = geometry.getJSONObject("location");
+            JSONArray resultArr = reader.getJSONArray("results");
 
-            name = candidates.getString("name");
-            address = candidates.getString("formatted_address");
-            lat = String.valueOf(location.getDouble("lat"));
-            lng = String.valueOf(location.getDouble("lng"));
+            Log.d("Ricky", resultArr.length() + " xdddd");
 
-            String[] fields = new String[4];
-            fields[0] = name;
-            fields[1] = address;
-            fields[2] = lat;
-            fields[3] = lng;
+            for (int i = 0; i < resultArr.length(); i++) {
+                JSONObject result = resultArr.getJSONObject(i);
+                JSONObject geometry = result.getJSONObject("geometry");
+                JSONObject location = geometry.getJSONObject("location");
 
-            LocationInfo[] singleSearch = new LocationInfo[1];
-            singleSearch[0] = new LocationInfo(fields);
+                name = result.getString("name");
+                address = result.getString("formatted_address");
+                lat = String.valueOf(location.getDouble("lat"));
+                lng = String.valueOf(location.getDouble("lng"));
+
+                String[] fields = new String[4];
+                fields[0] = name;
+                fields[1] = address;
+                fields[2] = lat;
+                fields[3] = lng;
+
+                searchData.add(new LocationInfo(fields));
+            }
 
             // Create/Specify Adapters
-            RecyclerView.Adapter mAdapter = new MyAdapter(singleSearch);
+            RecyclerView.Adapter mAdapter = new MyAdapter(searchData);
             location_list.setAdapter(mAdapter);
             location_list.setVisibility(View.VISIBLE);
         } else {
@@ -442,15 +468,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         reader.close();
         return sb.toString();
-    }
-
-    // Change circle that indicates search radius
-    public static void changeRadius() {
-        circle.radius(searchRadius);
-        if (currentCircle != null) {
-            currentCircle.remove();
-            currentCircle = map.addCircle(circle);
-        }
     }
 
 }

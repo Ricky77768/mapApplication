@@ -25,24 +25,6 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         setting_map_type.setAdapter(adapter);
         setting_map_type.setOnItemSelectedListener(this);
         setting_map_type.setSelection(MapsActivity.map.getMapType() - 1);
-
-        // Search Radius - Spinner
-        Spinner settings_search_radius = findViewById(R.id.settings_search_radius);
-        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this, R.array.search_radius, android.R.layout.simple_spinner_item);
-        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        settings_search_radius.setAdapter(adapter2);
-        settings_search_radius.setOnItemSelectedListener(this);
-        switch (MapsActivity.searchRadius) {
-            case 10000:
-                settings_search_radius.setSelection(0);
-                break;
-            case 25000:
-                settings_search_radius.setSelection(1);
-                break;
-            case 50000:
-                settings_search_radius.setSelection(2);
-                break;
-        }
     }
 
     @Override // Switches map type/search radius
@@ -62,20 +44,6 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
                 break;
             case "Hybird":
                 MapsActivity.map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                break;
-
-             // Search Radius
-            case "Small (10km)":
-                MapsActivity.searchRadius = 10000;
-                MapsActivity.changeRadius();
-                break;
-            case "Medium (25km)":
-                MapsActivity.searchRadius = 25000;
-                MapsActivity.changeRadius();
-                break;
-            case "Large (50km)":
-                MapsActivity.searchRadius = 50000;
-                MapsActivity.changeRadius();
                 break;
         }
     }

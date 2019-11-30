@@ -1,12 +1,14 @@
 package com.example.mapapplication;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class LocationInfo {
     String name, address, lat, lng;
     LatLng position;
     MarkerOptions markerOption;
+    Marker locationMarker;
 
     public LocationInfo(String[] data) {
         name = data[0];
@@ -16,7 +18,8 @@ public class LocationInfo {
 
         position = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
         markerOption = new MarkerOptions().position(position);
-        MapsActivity.singleSearchMarker = MapsActivity.map.addMarker(markerOption);
+        locationMarker = MapsActivity.map.addMarker(markerOption);
+        MapsActivity.searchMarkers.add(locationMarker);
     }
 
 }
