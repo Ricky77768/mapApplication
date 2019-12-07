@@ -36,6 +36,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONArray;
@@ -56,7 +57,7 @@ import java.util.ArrayList;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     public static GoogleMap map;
     public static Marker searchCenter;
-    public static Marker singleSearchMarker;
+    public static Marker originalDestination;
     public static String searchURL;
     public static ArrayList<Marker> searchMarkers = new ArrayList<>();
 
@@ -190,8 +191,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (location_list.getVisibility() == View.INVISIBLE) {
 
                     // Start file download
-                    DownloadLocation downloadLocation = new DownloadLocation();
-                    downloadLocation.execute(searchURL);
+                    DownloadFile downloadFile = new DownloadFile();
+                    downloadFile.execute(searchURL);
                     fab_search.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
                     location_list.setHasFixedSize(false);
 
@@ -300,13 +301,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public TextView location_name;
             public TextView location_otherinfo;
-            public ImageView location_picture;
+            public Button location_go;
 
             public MyViewHolder(View v) {
                 super(v);
                 location_name = v.findViewById(R.id.location_name);
                 location_otherinfo = v.findViewById(R.id.location_otherinfo);
-                location_picture = v.findViewById(R.id.location_picture);
+                location_go = v.findViewById(R.id.location_go);
             }
         }
 
@@ -325,10 +326,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Replace a View (by Layout Manager) (position is the current index of dataset based on which View)
         @Override
-        public void onBindViewHolder(MyViewHolder holder, int position) {
+        public void onBindViewHolder(final MyViewHolder holder, int position) {
             holder.location_name.setText(dataSet.get(position).name);
             holder.location_otherinfo.setText(dataSet.get(position).address);
-            holder.location_picture.setImageResource(R.drawable.ic_launcher_background);
+
+            holder.location_go.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    final RecyclerView location_list = findViewById(R.id.location_list);
+                    final EditText input_location = findViewById(R.id.input_location);
+                    final FloatingActionButton fab_help = findViewById(R.id.fab_help);
+                    final FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
+                    final FloatingActionButton fab_search = findViewById(R.id.fab_search);
+
+                    LatLng coordinates = new LatLng(Double.parseDouble(dataSet.get(holder.getAdapterPosition()).lat), Double.parseDouble(dataSet.get(holder.getAdapterPosition()).lng));
+                    originalDestination = map.addMarker(new MarkerOptions().position(coordinates));
+                    searchCenter.remove();
+                    for (Marker x : searchMarkers) {
+                        x.remove();
+                    }
+                    searchMarkers = new ArrayList<>();
+                    fab_help.setVisibility(View.INVISIBLE);
+                    fab_search.setVisibility(View.INVISIBLE);
+                    fab_marker_delete.setVisibility(View.INVISIBLE);
+                    input_location.setVisibility(View.INVISIBLE);
+                    location_list.setVisibility(View.INVISIBLE);
+
+                    // TODO: Confirm location screen here, also have the ability to go back
+                    // TODO: Get current location LatLng
+                    String destinationURL = "https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&key=";
+                    destinationURL += getString(R.string.google_maps_key);
+                    Log.d("Ricky", destinationURL);
+
+                    // TODO: algorithm to find suitable additional POIS, list all in page
+                    // TODO: Then, set selected ones as waypoints, find path
+                    // TODO: Download file here, and then do something, try to only use one asynctask class
+
+
+                }
+            });
+
         }
 
         @Override
@@ -338,7 +376,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     // File Download
-    private class DownloadLocation extends AsyncTask<String, Integer, String> {
+    private class DownloadFile extends AsyncTask<String, Integer, String> {
         protected String doInBackground (String... urls) {
             int count = 0;
             try {
@@ -375,7 +413,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 output.close();
                 input.close();
 
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return null;
         }
         @Override
@@ -387,7 +427,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(String s) {
             try {
-                parseInfo();
+                parseSearchInfo();
             } catch (Exception e) {
                 Log.e("Ricky", e.getMessage());
             }
@@ -395,8 +435,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    // Function to parse single location search data
-    public void parseInfo() throws Exception {
+    // Function to parse location search data
+    public void parseSearchInfo() throws Exception {
         String name, address, lat, lng;
         RecyclerView location_list = findViewById(R.id.location_list);
         FloatingActionButton fab_search = findViewById(R.id.fab_search);
@@ -413,8 +453,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ArrayList<LocationInfo> searchData = new ArrayList<>();
         if (reader.getString("status").equals("OK")) {
             JSONArray resultArr = reader.getJSONArray("results");
-
-            Log.d("Ricky", resultArr.length() + " xdddd");
 
             for (int i = 0; i < resultArr.length(); i++) {
                 JSONObject result = resultArr.getJSONObject(i);
@@ -456,6 +494,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             AlertDialog alert = ADbuilder.create();
             alert.show();
         }
+        data.delete();
     }
 
     // Function to convert file to a String

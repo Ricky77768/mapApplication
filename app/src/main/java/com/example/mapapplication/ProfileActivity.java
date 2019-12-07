@@ -5,9 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 
@@ -48,6 +53,23 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivityForResult(intent, CREATE_PROFILE);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Gson gson = new Gson();
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+
+        int index = 0;
+        String profile = "";
+
+        while (true) {
+            profile = sharedPref.getString("profile" + index, null);
+            if (profile == null) { break; }
+            profiles.add(gson.fromJson(profile, ProfileInfo.class));
+            index++;
+        }
 
         RecyclerView profile_list = findViewById(R.id.profile_list);
         profile_list.setHasFixedSize(false);
@@ -56,6 +78,25 @@ public class ProfileActivity extends AppCompatActivity {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         profile_list.setLayoutManager(mLayoutManager);
         profile_list.setAdapter(mAdapter);
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // First Clear preference file to avoid deleted profiles coming back
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        sharedPref.edit().clear().commit();
+        Gson gson = new Gson();
+
+        for (int i = 0; i < profiles.size(); i++) {
+            String profile = gson.toJson(profiles.get(i));
+            editor.putString("profile" + i, profile);
+        }
+
+        editor.apply();
     }
 
     @Override
@@ -93,8 +134,6 @@ public class ProfileActivity extends AppCompatActivity {
             public Button profile_list_delete;
             public Button profile_list_edit;
             public Button profile_list_select;
-
-
 
             public MyViewHolder(View v) {
                 super(v);

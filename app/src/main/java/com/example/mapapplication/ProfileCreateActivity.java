@@ -215,7 +215,9 @@ public class ProfileCreateActivity extends AppCompatActivity {
                 ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
                 profile_create_icon.setImageBitmap(new Compressor(this).compressToBitmap(f));
 
-            } catch (IOException e) { }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
         }
     }
