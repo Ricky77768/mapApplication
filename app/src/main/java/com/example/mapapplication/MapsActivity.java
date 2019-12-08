@@ -61,6 +61,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static String searchURL;
     public static ArrayList<Marker> searchMarkers = new ArrayList<>();
 
+    // Test Commit
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
