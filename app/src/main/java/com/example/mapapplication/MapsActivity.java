@@ -61,8 +61,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static String searchURL;
     public static ArrayList<Marker> searchMarkers = new ArrayList<>();
 
-    // Test Commit
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -217,17 +215,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    // If RecycleView is open, close it instead. Else, close the app.
+    // Changes how the back button functions
     public void onBackPressed() {
         RecyclerView location_list = findViewById(R.id.location_list);
         FloatingActionButton fab_search = findViewById(R.id.fab_search);
-        if (location_list.getVisibility() == View.VISIBLE) {
+        FloatingActionButton fab_help = findViewById(R.id.fab_help);
+        FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
+        EditText input_location = findViewById(R.id.input_location);
+
+        if (location_list.getVisibility() == View.INVISIBLE && searchMarkers.size() != 0) {
+            if (searchCenter != null) { searchCenter.setVisible(true); }
+            if (originalDestination != null) { originalDestination.remove(); }
+            for (Marker x : searchMarkers) { x.setVisible(true); }
+            fab_help.setVisibility(View.VISIBLE);
+            fab_search.setVisibility(View.VISIBLE);
+            fab_marker_delete.setVisibility(View.VISIBLE);
+            input_location.setVisibility(View.VISIBLE);
+            location_list.setVisibility(View.VISIBLE);
+
+        } else if (location_list.getVisibility() == View.VISIBLE) {
             location_list.setVisibility(View.INVISIBLE);
             fab_search.setImageResource(android.R.drawable.ic_menu_search);
             for (Marker x : searchMarkers) {
                 x.remove();
             }
             searchMarkers = new ArrayList<>();
+
         } else {
             super.onBackPressed();
         }
@@ -250,7 +263,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
-            // Add a marker and a search radius
+            // Add a marker
             @Override
             public void onMapClick(LatLng latLng) {
                 if (searchCenter != null) {
@@ -344,11 +357,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     LatLng coordinates = new LatLng(Double.parseDouble(dataSet.get(holder.getAdapterPosition()).lat), Double.parseDouble(dataSet.get(holder.getAdapterPosition()).lng));
                     originalDestination = map.addMarker(new MarkerOptions().position(coordinates));
-                    searchCenter.remove();
-                    for (Marker x : searchMarkers) {
-                        x.remove();
+
+                    if (searchCenter != null) {
+                        searchCenter.setVisible(false);
                     }
-                    searchMarkers = new ArrayList<>();
+                    for (Marker x : searchMarkers) {
+                        x.setVisible(false);
+                    }
+
                     fab_help.setVisibility(View.INVISIBLE);
                     fab_search.setVisibility(View.INVISIBLE);
                     fab_marker_delete.setVisibility(View.INVISIBLE);
@@ -364,7 +380,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     // TODO: algorithm to find suitable additional POIS, list all in page
                     // TODO: Then, set selected ones as waypoints, find path
                     // TODO: Download file here, and then do something, try to only use one asynctask class
-
 
                 }
             });
