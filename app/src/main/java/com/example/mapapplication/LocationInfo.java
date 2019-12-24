@@ -5,6 +5,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class LocationInfo {
+
+    // Test Laptop Commit
     String name, address, lat, lng;
     LatLng position;
     MarkerOptions markerOption;
