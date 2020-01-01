@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,8 +26,8 @@ import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 
 public class ProfileActivity extends AppCompatActivity {
-    final int CREATE_PROFILE = 1;
-    final int EDIT_PROFILE = 2;
+    final int CREATE_PROFILE = 2;
+    final int EDIT_PROFILE = 3;
     ArrayList<ProfileInfo> profiles = new ArrayList<>();
     RecyclerView.Adapter mAdapter = new ProfileActivity.MyAdapter(profiles);
 
@@ -50,42 +51,14 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 }, 500);
                 Intent intent = new Intent(ProfileActivity.this, ProfileCreateActivity.class);
-                startActivityForResult(intent, CREATE_PROFILE);
+                startActivity(intent);
             }
         });
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Gson gson = new Gson();
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-
-        int index = 0;
-        String profile = "";
-
-        while (true) {
-            profile = sharedPref.getString("profile" + index, null);
-            if (profile == null) { break; }
-            profiles.add(gson.fromJson(profile, ProfileInfo.class));
-            index++;
-        }
-
-        RecyclerView profile_list = findViewById(R.id.profile_list);
-        profile_list.setHasFixedSize(false);
-
-        // Create LayoutManager
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        profile_list.setLayoutManager(mLayoutManager);
-        profile_list.setAdapter(mAdapter);
-
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
-
-        // First Clear preference file to avoid deleted profiles coming back
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         sharedPref.edit().clear().commit();
@@ -100,20 +73,38 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    protected void onResume() {
+        super.onResume();
 
-        // Create a profile
-        if (requestCode == CREATE_PROFILE && resultCode == RESULT_OK) {
-            profiles.add(new ProfileInfo(data));
+        Gson gson = new Gson();
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        int index = 0;
+        String profile = "";
+
+        profiles.clear();
+        while (true) {
+            profile = sharedPref.getString("profile" + index, null);
+            if (profile == null) { break; }
+            profiles.add(gson.fromJson(profile, ProfileInfo.class));
+            index++;
         }
 
-        // Editing an existing profile
-        if (requestCode == EDIT_PROFILE && resultCode == RESULT_OK) {
-            profiles.set(data.getIntExtra("P_position", -1), new ProfileInfo(data));
+        RecyclerView profile_list = findViewById(R.id.profile_list);
+        profile_list.setHasFixedSize(false);
+
+        // Check if the function is triggered by a "profile create" or "profile edit" or screen refresh
+        if (ProfileCreateActivity.status == CREATE_PROFILE) {
+            profiles.add(new ProfileInfo(ProfileCreateActivity.savedData));
+            ProfileCreateActivity.status = 0;
+        } else if (ProfileCreateActivity.status == EDIT_PROFILE) {
+            profiles.set(ProfileCreateActivity.savedData.getIntExtra("P_position", -1), new ProfileInfo(ProfileCreateActivity.savedData));
+            ProfileCreateActivity.status = 0;
         }
 
-        mAdapter.notifyDataSetChanged();
+        // Create LayoutManager
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        profile_list.setLayoutManager(mLayoutManager);
+        profile_list.setAdapter(mAdapter);
     }
 
     // Adapter for RecycleView
@@ -143,10 +134,10 @@ public class ProfileActivity extends AppCompatActivity {
                 profile_list_text_time = v.findViewById(R.id.profile_list_text_time);
                 profile_list_text_rating = v.findViewById(R.id.profile_list_text_rating);
                 profile_list_tags = v.findViewById(R.id.profile_list_tags);
-                profile_list_picture = v.findViewById(R.id.profile_list_picture);
                 profile_list_edit = v.findViewById(R.id.profile_list_edit);
                 profile_list_delete = v.findViewById(R.id.profile_list_delete);
                 profile_list_select = v.findViewById(R.id.profile_list_select);
+                profile_list_picture = v.findViewById(R.id.profile_list_picture);
             }
         }
 
@@ -183,7 +174,6 @@ public class ProfileActivity extends AppCompatActivity {
             } else {
                 holder.profile_list_text_rating.setText(data.get(position).rating + " Star(s)");
             }
-            // holder.profile_list_picture.setImageBitmap(data.get(position).icon);
 
             String tags_description = "Visit: ";
             for (String x :data.get(position).tags) {
@@ -191,19 +181,47 @@ public class ProfileActivity extends AppCompatActivity {
             }
             holder.profile_list_tags.setText(tags_description);
 
+            switch (data.get(position).icon) {
+                case 1:
+                    holder.profile_list_picture.setImageResource(R.drawable.profile_icon_food);
+                    break;
+                case 2:
+                    holder.profile_list_picture.setImageResource(R.drawable.profile_icon_sports);
+                    break;
+                case 3:
+                    holder.profile_list_picture.setImageResource(R.drawable.profile_icon_nightlife);
+                    break;
+                case 4:
+                    holder.profile_list_picture.setImageResource(R.drawable.profile_icon_sightseeing);
+                    break;
+            }
+
             // It will pass current profile's information into a ProfileCreateActivity
             holder.profile_list_edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    holder.profile_list_select.setEnabled(false);
+                    holder.profile_list_edit.setEnabled(false);
+                    holder.profile_list_delete.setEnabled(false);
+                    holder.profile_list_select.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            holder.profile_list_select.setEnabled(true);
+                            holder.profile_list_edit.setEnabled(true);
+                            holder.profile_list_delete.setEnabled(true);
+                        }
+                    }, 500);
+
                     Intent intent = new Intent(ProfileActivity.this, ProfileCreateActivity.class);
                     intent.putExtra("P_edit_name", profiles.get(holder.getAdapterPosition()).name);
-                    intent.putStringArrayListExtra("P_edit_tags", profiles.get(holder.getAdapterPosition()).tags);
+                    intent.putExtra("P_edit_icon", profiles.get(holder.getAdapterPosition()).icon);
                     intent.putExtra("P_edit_numOfPlaces", profiles.get(holder.getAdapterPosition()).numOfPlaces);
                     intent.putExtra("P_edit_time", profiles.get(holder.getAdapterPosition()).rawTime);
                     intent.putExtra("P_edit_budget", profiles.get(holder.getAdapterPosition()).rawBudget);
                     intent.putExtra("P_edit_rating", profiles.get(holder.getAdapterPosition()).rawRating);
                     intent.putExtra("P_edit_position", holder.getAdapterPosition());
-                    startActivityForResult(intent, EDIT_PROFILE);
+                    intent.putStringArrayListExtra("P_edit_tags", profiles.get(holder.getAdapterPosition()).tags);
+                    startActivity(intent);
                 }
             });
 
@@ -211,6 +229,18 @@ public class ProfileActivity extends AppCompatActivity {
             holder.profile_list_delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    holder.profile_list_select.setEnabled(false);
+                    holder.profile_list_edit.setEnabled(false);
+                    holder.profile_list_delete.setEnabled(false);
+                    holder.profile_list_select.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            holder.profile_list_select.setEnabled(true);
+                            holder.profile_list_edit.setEnabled(true);
+                            holder.profile_list_delete.setEnabled(true);
+                        }
+                    }, 500);
+
                     AlertDialog.Builder ADbuilder = new AlertDialog.Builder(ProfileActivity.this);
                     ADbuilder.setMessage("Are you sure you want to delete this profile?");
                     ADbuilder.setCancelable(true);
@@ -244,6 +274,18 @@ public class ProfileActivity extends AppCompatActivity {
             holder.profile_list_select.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    holder.profile_list_select.setEnabled(false);
+                    holder.profile_list_edit.setEnabled(false);
+                    holder.profile_list_delete.setEnabled(false);
+                    holder.profile_list_select.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            holder.profile_list_select.setEnabled(true);
+                            holder.profile_list_edit.setEnabled(true);
+                            holder.profile_list_delete.setEnabled(true);
+                        }
+                    }, 500);
+
                    finish(); // TEMPORARY
                 }
             });
@@ -255,4 +297,5 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
     }
+
 }

@@ -7,14 +7,12 @@ import android.os.Bundle;
 
 import java.util.ArrayList;
 
-// TODO: Implement Icon Sync once sorted out
 public class ProfileInfo {
-
     int position; // For RecycleView - Determine which profile to edit
+    int icon; // For selecting icon to display
     String name, numOfPlaces, budget, time, rating; // Values to display
     String rawBudget, rawTime, rawRating; // Integer values for internal calculations
     ArrayList<String> tags;
-    // Bitmap icon;
 
     // Profile Creation
     public ProfileInfo(Intent data) {
@@ -54,12 +52,12 @@ public class ProfileInfo {
             rating = String.valueOf(Integer.parseInt(rawRating) / 10.0);
         }
 
-        tags = data.getStringArrayListExtra("P_tags");
-        // icon = data.getParcelableExtra("icon");
-
         if (data.hasExtra("P_position")) {
             position = data.getIntExtra("P_position", -1);
         }
+
+        icon = data.getIntExtra("P_icon", -1);
+        tags = data.getStringArrayListExtra("P_tags");
     }
 
 }

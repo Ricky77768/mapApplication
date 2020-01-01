@@ -30,11 +30,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import id.zelory.compressor.Compressor;
-
 public class ProfileCreateActivity extends AppCompatActivity {
-    final int REQUEST_IMAGE_CAPTURE = 1;
-    final int PICK_IMAGE_REQUEST = 2;
+    int icon = 1; // For icon selection
+    final int SELECT_ICON = 1;
+
+    // For passing data to ProfileActivity
+    public static Intent savedData;
+    public static int status;
+    final int CREATE_PROFILE = 2;
+    final int EDIT_PROFILE = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +74,6 @@ public class ProfileCreateActivity extends AppCompatActivity {
                     }
                 }, 500);
 
-                // TODO - Profile Picture OR simplify down to choose a set of icons
                 // Passes all data into an intent for profile creation
                 Intent data = new Intent();
                 String name = profile_create_profile_name.getText().toString();
@@ -92,6 +95,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
                 }
 
                 data.putExtra("P_name", name);
+                data.putExtra("P_icon", icon);
                 data.putExtra("P_numOfPlaces", numOfPlaces);
                 data.putExtra("P_time",time);
                 data.putExtra("P_budget", budget);
@@ -102,9 +106,13 @@ public class ProfileCreateActivity extends AppCompatActivity {
                 Intent previousIntent = getIntent();
                 if (previousIntent.hasExtra("P_edit_position")) {
                     data.putExtra("P_position", previousIntent.getIntExtra("P_edit_position", -1));
+                    status = EDIT_PROFILE;
+                } else {
+                    status = CREATE_PROFILE;
                 }
 
-                // data.putExtra("icon", *SOMETHING*);
+                savedData = data;
+
                 setResult(RESULT_OK, data);
                 finish();
             }
@@ -136,90 +144,43 @@ public class ProfileCreateActivity extends AppCompatActivity {
             setValues();
         }
 
-        // For profile pictures (MAY BE REMOVED)
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         profile_create_icon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String[] options = {"Take a Picture", "Choose from Album"};
-                builder.setTitle("Upload Profile Picture");
-                builder.setItems(options, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int selected) {
-                        if (selected == 0) {
-                            takePicture();
-                        } else {
-                            choosePicture();
-                        }
-                    }
-                });
-
-                builder.show();
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileCreateActivity.this, ProfileCreateIconActivity.class);
+                startActivityForResult(intent, SELECT_ICON);
             }
         });
 
-
-
     }
 
-    // For taking picture (MAY BE REMOVED)
-    public void takePicture() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        }
-    }
-
-    // For choosing image from album (MAY BE REMOVED)
-    public void choosePicture() {
-        Intent intent = new Intent();
-
-        // Show only images, no videos or anything else
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-
-        // Always show the chooser (if there are multiple options available)
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
-    }
-
-    // To handle picture selection (MAY BE REMOVED)
-    @Override
+    @Override // To handle icon selection
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
 
+        if (requestCode == SELECT_ICON && resultCode == RESULT_OK) {
             ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
-            profile_create_icon.setImageBitmap(imageBitmap);
-        }
+            int icon_number = data.getIntExtra("icon_number", 1);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK) {
-            Uri uri = data.getData();
-
-            try {
-                // TODO: Add loading screen when compressing image
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-
-                File f = new File(this.getCacheDir(), "Sample");
-                f.createNewFile();
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
-                byte[] bitmapdata = bos.toByteArray();
-                FileOutputStream fos = new FileOutputStream(f);
-                fos.write(bitmapdata);
-                fos.flush();
-                fos.close();
-
-                ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
-                profile_create_icon.setImageBitmap(new Compressor(this).compressToBitmap(f));
-
-            } catch (IOException e) {
-                e.printStackTrace();
+            switch (icon_number) {
+                case 1:
+                    icon = 1;
+                    profile_create_icon.setImageResource(R.drawable.profile_icon_food);
+                    break;
+                case 2:
+                    icon = 2;
+                    profile_create_icon.setImageResource(R.drawable.profile_icon_sports);
+                    break;
+                case 3:
+                    icon = 3;
+                    profile_create_icon.setImageResource(R.drawable.profile_icon_nightlife);
+                    break;
+                case 4:
+                    icon = 4;
+                    profile_create_icon.setImageResource(R.drawable.profile_icon_sightseeing);
+                    break;
             }
-
         }
+
     }
 
     @Override // Creates an alert to warn user that created profile will not be saved
@@ -332,7 +293,6 @@ public class ProfileCreateActivity extends AppCompatActivity {
         final SeekBar profile_create_seekbar_time = findViewById(R.id.profile_create_seekbar_time);
         final SeekBar profile_create_seekbar_rating = findViewById(R.id.profile_create_seekbar_rating);
         final EditText profile_create_profile_name = findViewById(R.id.profile_create_profile_name);
-        final ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
         final ChipGroup profile_create_chipgroup = findViewById(R.id.profile_create_chipgroup);
 
         profile_create_profile_name.setText(passedData.getStringExtra("P_edit_name"));
@@ -349,6 +309,28 @@ public class ProfileCreateActivity extends AppCompatActivity {
                 }
             }
         }
+        setIcon(passedData.getIntExtra("P_edit_icon", -1));
 
     }
+
+    // Set Icon
+    public void setIcon(int index) {
+        final ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
+
+        switch (index) {
+            case 1:
+                profile_create_icon.setImageResource(R.drawable.profile_icon_food);
+                break;
+            case 2:
+                profile_create_icon.setImageResource(R.drawable.profile_icon_sports);
+                break;
+            case 3:
+                profile_create_icon.setImageResource(R.drawable.profile_icon_nightlife);
+                break;
+            case 4:
+                profile_create_icon.setImageResource(R.drawable.profile_icon_sightseeing);
+                break;
+        }
+    }
+
 }

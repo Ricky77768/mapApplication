@@ -85,9 +85,12 @@
         android:layout_height="100dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
+        android:adjustViewBounds="true"
+        android:background="@null"
+        android:scaleType="fitCenter"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_create_cancel"
-        app:srcCompat="@drawable/ic_launcher_background" />
+        app:srcCompat="@drawable/profile_icon_food" />
 
     <SeekBar
         android:id="@+id/profile_create_seekbar_numOfPlaces"
