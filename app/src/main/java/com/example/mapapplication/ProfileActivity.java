@@ -28,7 +28,7 @@ import java.util.ArrayList;
 public class ProfileActivity extends AppCompatActivity {
     final int CREATE_PROFILE = 2;
     final int EDIT_PROFILE = 3;
-    ArrayList<ProfileInfo> profiles = new ArrayList<>();
+    public static ArrayList<ProfileInfo> profiles = new ArrayList<>();
     RecyclerView.Adapter mAdapter = new ProfileActivity.MyAdapter(profiles);
 
     @Override
@@ -38,16 +38,16 @@ public class ProfileActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Profiles");
 
         // References
-        final FloatingActionButton fab_profile = findViewById(R.id.profile_create);
+        final FloatingActionButton fab_profile_create = findViewById(R.id.profile_create);
 
         // Click Listener
-        fab_profile.setOnClickListener(new View.OnClickListener() {
+        fab_profile_create.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                fab_profile.setEnabled(false);
-                fab_profile.postDelayed(new Runnable() {
+                fab_profile_create.setEnabled(false);
+                fab_profile_create.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        fab_profile.setEnabled(true);
+                        fab_profile_create.setEnabled(true);
                     }
                 }, 500);
                 Intent intent = new Intent(ProfileActivity.this, ProfileCreateActivity.class);
@@ -286,7 +286,11 @@ public class ProfileActivity extends AppCompatActivity {
                         }
                     }, 500);
 
-                   finish(); // TEMPORARY
+                    for (ProfileInfo x : data) {
+                        x.selected = false;
+                    }
+                    data.get(holder.getAdapterPosition()).selected = true;
+                    finish();
                 }
             });
         }

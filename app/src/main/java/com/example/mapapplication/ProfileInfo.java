@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class ProfileInfo {
     int position; // For RecycleView - Determine which profile to edit
     int icon; // For selecting icon to display
+    boolean selected = false; // For checking if this profile is selected in MapsActivity
     String name, numOfPlaces, budget, time, rating; // Values to display
     String rawBudget, rawTime, rawRating; // Integer values for internal calculations
     ArrayList<String> tags;

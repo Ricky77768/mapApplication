@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -22,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -38,6 +40,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -60,6 +63,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static Marker originalDestination;
     public static String searchURL;
     public static ArrayList<Marker> searchMarkers = new ArrayList<>();
+    public static ProfileInfo currentProfile;
+    boolean canPutMarker = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +74,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // References
         final RecyclerView location_list = findViewById(R.id.location_list);
         final EditText input_location = findViewById(R.id.input_location);
+        final TextView profile_name = findViewById(R.id.profile_name);
+        final ImageButton button_profiles = findViewById(R.id.button_profiles);
         final FloatingActionButton fab_settings = findViewById(R.id.fab_settings);
-        final FloatingActionButton fab_profiles = findViewById(R.id.fab_profiles);
         final FloatingActionButton fab_help = findViewById(R.id.fab_help);
         final FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
         final FloatingActionButton fab_search = findViewById(R.id.fab_search);
@@ -86,18 +92,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         location_list.setVisibility(View.INVISIBLE);
         fab_marker_delete.setVisibility(View.INVISIBLE);
 
+        // Load previously selected profile
+        Gson gson = new Gson();
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        String profile = sharedPref.getString("current_profile", null);
+        if (profile != null) {
+            currentProfile = gson.fromJson(profile, ProfileInfo.class);
+            loadProfile(currentProfile);
+        } else {
+            currentProfile = null;
+            loadProfile(currentProfile);
+        }
+
         // Click Listeners
-        fab_profiles.setOnClickListener(new View.OnClickListener() {
+        profile_name.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
                 startActivity(intent);
-                fab_profiles.setEnabled(false);
+                profile_name.setEnabled(false);
+                button_profiles.setEnabled(false);
                 fab_settings.setEnabled(false);
                 fab_help.setEnabled(false);
-                fab_profiles.postDelayed(new Runnable() {
+                button_profiles.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        fab_profiles.setEnabled(true);
+                        profile_name.setEnabled(true);
+                        button_profiles.setEnabled(true);
+                        fab_settings.setEnabled(true);
+                        fab_help.setEnabled(true);
+                    }
+                }, 500);
+            }
+        });
+
+        button_profiles.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
+                startActivity(intent);
+                profile_name.setEnabled(false);
+                button_profiles.setEnabled(false);
+                fab_settings.setEnabled(false);
+                fab_help.setEnabled(false);
+                button_profiles.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        profile_name.setEnabled(true);
+                        button_profiles.setEnabled(true);
                         fab_settings.setEnabled(true);
                         fab_help.setEnabled(true);
                     }
@@ -109,13 +149,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 Intent intent = new Intent(MapsActivity.this, SettingsActivity.class);
                 startActivity(intent);
-                fab_profiles.setEnabled(false);
+                profile_name.setEnabled(false);
+                button_profiles.setEnabled(false);
                 fab_settings.setEnabled(false);
                 fab_help.setEnabled(false);
-                fab_profiles.postDelayed(new Runnable() {
+                button_profiles.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        fab_profiles.setEnabled(true);
+                        profile_name.setEnabled(true);
+                        button_profiles.setEnabled(true);
                         fab_settings.setEnabled(true);
                         fab_help.setEnabled(true);
                     }
@@ -125,13 +167,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         fab_help.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                fab_profiles.setEnabled(false);
+                profile_name.setEnabled(false);
+                button_profiles.setEnabled(false);
                 fab_settings.setEnabled(false);
                 fab_help.setEnabled(false);
-                fab_profiles.postDelayed(new Runnable() {
+                button_profiles.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        fab_profiles.setEnabled(true);
+                        profile_name.setEnabled(true);
+                        button_profiles.setEnabled(true);
                         fab_settings.setEnabled(true);
                         fab_help.setEnabled(true);
                     }
@@ -215,6 +259,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        final TextView profile_name = findViewById(R.id.profile_name);
+        final ImageButton button_profiles = findViewById(R.id.button_profiles);
+
+        // TODO: Fix - Profile only updates in real time when "selected" pressed
+        for (ProfileInfo x : ProfileActivity.profiles) {
+            if (x.selected) {
+                currentProfile = x;
+            }
+        }
+        loadProfile(currentProfile);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        for (ProfileInfo x : ProfileActivity.profiles) {
+            if (x.selected) {
+                SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                sharedPref.edit().clear().commit();
+                Gson gson = new Gson();
+                editor.putString("current_profile" , gson.toJson(currentProfile));
+                editor.apply();
+            }
+        }
+    }
+
+    @Override
     // Changes how the back button functions
     public void onBackPressed() {
         RecyclerView location_list = findViewById(R.id.location_list);
@@ -224,6 +299,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         EditText input_location = findViewById(R.id.input_location);
 
         if (location_list.getVisibility() == View.INVISIBLE && searchMarkers.size() != 0) {
+            canPutMarker = true;
             if (searchCenter != null) { searchCenter.setVisible(true); }
             if (originalDestination != null) { originalDestination.remove(); }
             for (Marker x : searchMarkers) { x.setVisible(true); }
@@ -266,6 +342,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Add a marker
             @Override
             public void onMapClick(LatLng latLng) {
+                if (!canPutMarker) { return; }
+
                 if (searchCenter != null) {
                     searchCenter.remove();
                 }
@@ -348,6 +426,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             holder.location_go.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    canPutMarker = false;
 
                     final RecyclerView location_list = findViewById(R.id.location_list);
                     final EditText input_location = findViewById(R.id.input_location);
@@ -370,17 +449,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     fab_marker_delete.setVisibility(View.INVISIBLE);
                     input_location.setVisibility(View.INVISIBLE);
                     location_list.setVisibility(View.INVISIBLE);
-
-                    // TODO: Confirm location screen here, also have the ability to go back
-                    // TODO: Get current location LatLng
                     String destinationURL = "https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&key=";
                     destinationURL += getString(R.string.google_maps_key);
-                    Log.d("Ricky", destinationURL);
 
-                    // TODO: algorithm to find suitable additional POIS, list all in page
-                    // TODO: Then, set selected ones as waypoints, find path
-                    // TODO: Download file here, and then do something, try to only use one asynctask class
-
+                    /* TODO List Below
+                     * - Confirm Location Screen here
+                     *      - Have ability to go back, and change starting location
+                     *      - Have a way to get current LatLng
+                     * - Create Algorithm to find suitable POIs based on profile, list in RecycleView
+                     *      - Use LatLngBound & SearchBoxOptions?
+                     * - Set Selected locations as waypoints, find a path
+                     *      - Download the file here, then do something
+                     */
                 }
             });
 
@@ -524,6 +604,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         reader.close();
         return sb.toString();
+    }
+
+    // Load Profile
+    public void loadProfile(ProfileInfo x) {
+        final TextView profile_name = findViewById(R.id.profile_name);
+        final ImageButton button_profiles = findViewById(R.id.button_profiles);
+
+        if (x != null) {
+            profile_name.setText(currentProfile.name);
+            setIcon(currentProfile.icon);
+
+            //Gson gson = new Gson();
+            //Log.d("Ricky", gson.toJson(currentProfile));
+
+            return;
+        }
+        profile_name.setText("*No Profile Selected*");
+        setIcon(-1);
+    }
+
+    // Set Icon
+    public void setIcon(int index) {
+        final ImageButton button_profiles = findViewById(R.id.button_profiles);
+
+        switch (index) {
+            case 1:
+                button_profiles.setImageResource(R.drawable.profile_icon_food);
+                break;
+            case 2:
+                button_profiles.setImageResource(R.drawable.profile_icon_sports);
+                break;
+            case 3:
+                button_profiles.setImageResource(R.drawable.profile_icon_nightlife);
+                break;
+            case 4:
+                button_profiles.setImageResource(R.drawable.profile_icon_sightseeing);
+                break;
+            default:
+                button_profiles.setImageResource(R.mipmap.ic_launcher_round);
+                break;
+        }
     }
 
 }

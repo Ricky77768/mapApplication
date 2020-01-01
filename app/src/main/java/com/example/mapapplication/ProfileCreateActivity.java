@@ -319,15 +319,19 @@ public class ProfileCreateActivity extends AppCompatActivity {
 
         switch (index) {
             case 1:
+                icon = 1;
                 profile_create_icon.setImageResource(R.drawable.profile_icon_food);
                 break;
             case 2:
+                icon = 2;
                 profile_create_icon.setImageResource(R.drawable.profile_icon_sports);
                 break;
             case 3:
+                icon = 3;
                 profile_create_icon.setImageResource(R.drawable.profile_icon_nightlife);
                 break;
             case 4:
+                icon = 4;
                 profile_create_icon.setImageResource(R.drawable.profile_icon_sightseeing);
                 break;
         }
