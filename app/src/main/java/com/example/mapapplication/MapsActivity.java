@@ -64,7 +64,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static String searchURL;
     public static ArrayList<Marker> searchMarkers = new ArrayList<>();
     public static ProfileInfo currentProfile;
-    boolean canPutMarker = true;
+    boolean canPutMarker = true; // If a marker can be put down
+    int backState = 0; // Number of times the back button can be pressed before exiting app
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -233,6 +234,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 searchURL += "&radius=50000&key=" + getString(R.string.google_maps_key);
 
                 if (location_list.getVisibility() == View.INVISIBLE) {
+                    backState++;
 
                     // Start file download
                     DownloadFile downloadFile = new DownloadFile();
@@ -245,6 +247,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     location_list.setLayoutManager(mLayoutManager);
 
                 } else {
+                    backState--;
+
                     location_list.setVisibility(View.INVISIBLE);
                     fab_search.setImageResource(android.R.drawable.ic_menu_search);
                     for (Marker x : searchMarkers) {
@@ -298,7 +302,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
         EditText input_location = findViewById(R.id.input_location);
 
-        if (location_list.getVisibility() == View.INVISIBLE && searchMarkers.size() != 0) {
+        if (backState == 2) {
+            backState--;
             canPutMarker = true;
             if (searchCenter != null) { searchCenter.setVisible(true); }
             if (originalDestination != null) { originalDestination.remove(); }
@@ -309,7 +314,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             input_location.setVisibility(View.VISIBLE);
             location_list.setVisibility(View.VISIBLE);
 
-        } else if (location_list.getVisibility() == View.VISIBLE) {
+        } else if (backState == 1) {
+            backState--;
             location_list.setVisibility(View.INVISIBLE);
             fab_search.setImageResource(android.R.drawable.ic_menu_search);
             for (Marker x : searchMarkers) {
@@ -317,7 +323,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
             searchMarkers = new ArrayList<>();
 
-        } else {
+        } else if (backState == 0) {
             super.onBackPressed();
         }
     }
@@ -426,6 +432,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             holder.location_go.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    backState++;
                     canPutMarker = false;
 
                     final RecyclerView location_list = findViewById(R.id.location_list);

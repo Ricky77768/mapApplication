@@ -107,6 +107,7 @@ public class ProfileActivity extends AppCompatActivity {
         profile_list.setAdapter(mAdapter);
     }
 
+    // TODO: Implement feedback on selected profile (grey out select button and display "Selected"
     // Adapter for RecycleView
     public class MyAdapter extends RecyclerView.Adapter<ProfileActivity.MyAdapter.MyViewHolder> {
         private ArrayList<ProfileInfo> data;
@@ -195,6 +196,9 @@ public class ProfileActivity extends AppCompatActivity {
                     holder.profile_list_picture.setImageResource(R.drawable.profile_icon_sightseeing);
                     break;
             }
+
+            // Disables select profile button if already selected
+            if (data.get(position).selected) { holder.profile_list_select.setEnabled(false); }
 
             // It will pass current profile's information into a ProfileCreateActivity
             holder.profile_list_edit.setOnClickListener(new View.OnClickListener() {

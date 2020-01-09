@@ -146,6 +146,14 @@ public class ProfileCreateActivity extends AppCompatActivity {
 
         profile_create_icon.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                profile_create_icon.setEnabled(false);
+                profile_create_icon.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        profile_create_icon.setEnabled(true);
+                    }
+                }, 500);
+
                 Intent intent = new Intent(ProfileCreateActivity.this, ProfileCreateIconActivity.class);
                 startActivityForResult(intent, SELECT_ICON);
             }
@@ -227,7 +235,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
         }
 
         if (type.equals("Budget")) {
-            progressText.setText("Medium");
+            progressText.setText("Very Large");
         }
 
         sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
