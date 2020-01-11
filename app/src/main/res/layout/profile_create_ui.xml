@@ -8,9 +8,11 @@
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/profile_create_chipgroup"
-        android:layout_width="wrap_content"
+        android:layout_width="305dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_create_text2">
 
@@ -19,7 +21,7 @@
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Shops"
+            android:text="Attractions"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             app:chipBackgroundColor="@color/chip_bg_colors" />
 
@@ -28,7 +30,7 @@
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Attractions"
+            android:text="Education"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             app:chipBackgroundColor="@color/chip_bg_colors" />
 
@@ -37,10 +39,63 @@
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Restaurants"
+            android:text="Entertainment"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             app:chipBackgroundColor="@color/chip_bg_colors" />
 
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip4"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Food/Drinks"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:chipBackgroundColor="@color/chip_bg_colors" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip5"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Government"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:chipBackgroundColor="@color/chip_bg_colors" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip6"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Medical"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:chipBackgroundColor="@color/chip_bg_colors" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip7"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Religion"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:chipBackgroundColor="@color/chip_bg_colors" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip8"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Shops"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:chipBackgroundColor="@color/chip_bg_colors" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip9"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Transportation"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:chipBackgroundColor="@color/chip_bg_colors" />
 
     </com.google.android.material.chip.ChipGroup>
 
@@ -154,7 +209,7 @@
         android:layout_marginTop="48dp"
         android:text="Number of Places |"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_create_text2" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_chipgroup" />
 
     <TextView
         android:id="@+id/profile_create_text4"
@@ -194,7 +249,7 @@
         android:layout_marginTop="48dp"
         android:text="..."
         app:layout_constraintStart_toEndOf="@+id/profile_create_text3"
-        app:layout_constraintTop_toBottomOf="@+id/profile_create_text2" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_create_chipgroup" />
 
     <TextView
         android:id="@+id/profile_create_text_time"
