@@ -60,10 +60,13 @@ import java.util.ArrayList;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     public static GoogleMap map;
     public static Marker searchCenter;
+    public static Marker POISearchCentre;
     public static Marker originalDestination;
     public static String searchURL;
     public static ArrayList<Marker> searchMarkers = new ArrayList<>();
+    public static ArrayList<Marker> POISearchMarkers = new ArrayList<>();
     public static ProfileInfo currentProfile;
+    public static LatLng currentLocation;
     boolean canPutMarker = true; // If a marker can be put down
     int backState = 0; // Number of times the back button can be pressed before exiting app
 
@@ -308,6 +311,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (searchCenter != null) { searchCenter.setVisible(true); }
             if (originalDestination != null) { originalDestination.remove(); }
             for (Marker x : searchMarkers) { x.setVisible(true); }
+            for (Marker x : POISearchMarkers) { x.remove(); }
+            POISearchMarkers = new ArrayList<>();
             fab_help.setVisibility(View.VISIBLE);
             fab_search.setVisibility(View.VISIBLE);
             fab_marker_delete.setVisibility(View.VISIBLE);
@@ -375,7 +380,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Define a listener that responds to location updates
         LocationListener locationListener = new LocationListener() {
-            public void onLocationChanged(Location location) {}
+
+            public void onLocationChanged(Location location) {
+                LatLng userLocation = new LatLng(location.getLatitude(),location.getLongitude());
+                currentLocation = userLocation;
+            }
+
             public void onStatusChanged(String provider, int status, Bundle extras) {}
             public void onProviderEnabled(String provider) {}
             public void onProviderDisabled(String provider) {}
@@ -388,6 +398,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Location location = locationManager.getLastKnownLocation(locationProvider);
         LatLng userLocation = new LatLng(location.getLatitude(),location.getLongitude());
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation,10));
+        currentLocation = userLocation;
     }
 
     // Adapter for RecycleView
@@ -459,13 +470,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     String destinationURL = "https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&key=";
                     destinationURL += getString(R.string.google_maps_key);
 
+                    createPOISearchMarkers(currentLocation, coordinates);
+
                     /* TODO List Below
                      * - Confirm Location Screen here
-                     *      - Have ability to go back, and change starting location
+                     *      - Have ability to go back a
+                     *      - Have a way to change starting location
                      *      - Have a way to get current LatLng
-                     * - Create Algorithm to find suitable POIs based on profile, list in RecycleView
-                     *      - Use LatLngBound & SearchBoxOptions?
-                     * - Set Selected locations as waypoints, find a path
+                     * - For each POISearchPin, use nearby search radius 50km
+                     *      - Ignore places with "lodging" tag
+                     *      - Add places into based on user input RecycleView until 5-10 places are added per pin
+                     *      - Make sure to delete duplicates, ensure there is still 5-10 per pin
+                     * - Set Selected POIs as waypoints, find a path
                      *      - Download the file here, then do something
                      */
                 }
@@ -621,10 +637,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (x != null) {
             profile_name.setText(currentProfile.name);
             setIcon(currentProfile.icon);
-
-            //Gson gson = new Gson();
-            //Log.d("Ricky", gson.toJson(currentProfile));
-
             return;
         }
         profile_name.setText("*No Profile Selected*");
@@ -651,6 +663,60 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             default:
                 button_profiles.setImageResource(R.mipmap.ic_launcher_round);
                 break;
+        }
+    }
+
+    // Functions to create markers that indicate the search centres
+    public void createPOISearchMarkers(LatLng current, LatLng destination) {
+        int points = 15; // Number of markers
+
+        double lat1 = current.latitude;
+        double long1 = current.longitude;
+
+        double lat2 = destination.latitude;
+        double long2 = destination.longitude;
+
+        double convertlat1 = convertLat(false, lat1);
+        double convertlat2 = convertLat(false, lat2);
+        double convertlong1 = convertLong(false, long1);
+        double convertlong2 = convertLong(false, long2);
+
+        double latChange = (convertlat2 - convertlat1) / (points + 1);
+        double longChange = (convertlong2 - convertlong1) / (points + 1);
+        double curLat = convertlat1;
+        double curLong = convertlong1;
+
+        for (int i = 0; i < points; i++) {
+            curLat += latChange;
+            curLong += longChange;
+
+            POISearchCentre = map.addMarker(new MarkerOptions().position(new LatLng(convertLat(true, curLat), convertLong(true, curLong))));
+            POISearchMarkers.add(POISearchCentre);
+        }
+    }
+
+    public static double convertLong(boolean toStandard, double longValue) {
+        if (toStandard) {
+            if (longValue > 180) {
+                return (360 - longValue) * -1;
+            } else {
+                return longValue;
+            }
+
+        } else {
+            if (longValue < 0) {
+                return 360 - (longValue * -1);
+            } else {
+                return longValue;
+            }
+        }
+    }
+
+    public static double convertLat(boolean toStandard, double latValue) {
+        if (toStandard) {
+            return latValue - 90;
+        } else {
+            return latValue + 90;
         }
     }
 
