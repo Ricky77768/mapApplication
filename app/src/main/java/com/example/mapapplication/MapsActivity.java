@@ -64,11 +64,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static Marker originalDestination;
     public static String searchURL;
     public static ArrayList<Marker> searchMarkers = new ArrayList<>();
+    public static ArrayList<Marker> POISearchCentres = new ArrayList<>();
     public static ArrayList<Marker> POISearchMarkers = new ArrayList<>();
+    public static ArrayList<LocationInfo> searchData = new ArrayList<>();
+    public static ArrayList<LocationInfo> POISearchData = new ArrayList<>();
     public static ProfileInfo currentProfile;
     public static LatLng currentLocation;
-    boolean canPutMarker = true; // If a marker can be put down
-    int backState = 0; // Number of times the back button can be pressed before exiting app
+    boolean canPutMarker = true;
+    int appState = 0;
+    /* The progress of app
+       0 = waiting for search
+       1 = waiting for destination selection
+       2 = waiting for POI selections
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -237,10 +245,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 searchURL += "&radius=50000&key=" + getString(R.string.google_maps_key);
 
                 if (location_list.getVisibility() == View.INVISIBLE) {
-                    backState++;
+                    appState++;
 
                     // Start file download
-                    DownloadFile downloadFile = new DownloadFile();
+                    DownloadFile downloadFile = new DownloadFile(1);
                     downloadFile.execute(searchURL);
                     fab_search.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
                     location_list.setHasFixedSize(false);
@@ -250,7 +258,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     location_list.setLayoutManager(mLayoutManager);
 
                 } else {
-                    backState--;
+                    appState--;
 
                     location_list.setVisibility(View.INVISIBLE);
                     fab_search.setImageResource(android.R.drawable.ic_menu_search);
@@ -305,30 +313,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
         EditText input_location = findViewById(R.id.input_location);
 
-        if (backState == 2) {
-            backState--;
+        if (appState == 2) {
+            appState--;
             canPutMarker = true;
             if (searchCenter != null) { searchCenter.setVisible(true); }
             if (originalDestination != null) { originalDestination.remove(); }
             for (Marker x : searchMarkers) { x.setVisible(true); }
             for (Marker x : POISearchMarkers) { x.remove(); }
             POISearchMarkers = new ArrayList<>();
+            POISearchData = new ArrayList<>();
             fab_help.setVisibility(View.VISIBLE);
             fab_search.setVisibility(View.VISIBLE);
             fab_marker_delete.setVisibility(View.VISIBLE);
             input_location.setVisibility(View.VISIBLE);
-            location_list.setVisibility(View.VISIBLE);
 
-        } else if (backState == 1) {
-            backState--;
+        } else if (appState == 1) {
+            appState--;
             location_list.setVisibility(View.INVISIBLE);
             fab_search.setImageResource(android.R.drawable.ic_menu_search);
             for (Marker x : searchMarkers) {
                 x.remove();
             }
             searchMarkers = new ArrayList<>();
+            searchData = new ArrayList<>();
 
-        } else if (backState == 0) {
+        } else if (appState == 0) {
             super.onBackPressed();
         }
     }
@@ -439,11 +448,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public void onBindViewHolder(final MyViewHolder holder, int position) {
             holder.location_name.setText(dataSet.get(position).name);
             holder.location_otherinfo.setText(dataSet.get(position).address);
-
             holder.location_go.setOnClickListener(new View.OnClickListener() {
+
                 @Override
                 public void onClick(View view) {
-                    backState++;
+
+                    holder.location_go.setEnabled(false);
+                    holder.location_go.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            holder.location_go.setEnabled(true);
+                        }
+                    }, 500);
+
+                    // TODO: Add button select functionality for POIS when ready
+                    // Temp solution
+                    if (appState != 1) { return; }
+
+                    appState++;
                     canPutMarker = false;
 
                     final RecyclerView location_list = findViewById(R.id.location_list);
@@ -466,11 +488,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     fab_search.setVisibility(View.INVISIBLE);
                     fab_marker_delete.setVisibility(View.INVISIBLE);
                     input_location.setVisibility(View.INVISIBLE);
-                    location_list.setVisibility(View.INVISIBLE);
-                    String destinationURL = "https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&key=";
-                    destinationURL += getString(R.string.google_maps_key);
 
-                    createPOISearchMarkers(currentLocation, coordinates);
+                    createPOISearchCentres(currentLocation, coordinates);
+
+                    for (int i = 0; i < POISearchCentres.size(); i++) {
+                        double markerLat = POISearchCentres.get(i).getPosition().latitude;
+                        double markerLong = POISearchCentres.get(i).getPosition().longitude;
+                        searchURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=";
+                        searchURL += markerLat + "," + markerLong + "&radius=50000&key=" + getString(R.string.google_maps_key);
+                        DownloadFile downloadFile = new DownloadFile(2);
+                        downloadFile.execute(searchURL);
+                    }
 
                     /* TODO List Below
                      * - Confirm Location Screen here
@@ -497,6 +525,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // File Download
     private class DownloadFile extends AsyncTask<String, Integer, String> {
+        int type; // 1 = Initial Search, 2 = POIs Search
+        public DownloadFile(int x) { type = x; }
+
         protected String doInBackground (String... urls) {
             int count = 0;
             try {
@@ -547,7 +578,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(String s) {
             try {
-                parseSearchInfo();
+                parseSearchInfo(type);
             } catch (Exception e) {
                 Log.e("Ricky", e.getMessage());
             }
@@ -555,9 +586,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    // Function to parse location search data
-    public void parseSearchInfo() throws Exception {
-        String name, address, lat, lng;
+    // Function to parse location search data (1 = initial search, 2 = POI search)
+    public void parseSearchInfo(int type) throws Exception {
+        String name = "", address = "", lat = "", lng = "";
         RecyclerView location_list = findViewById(R.id.location_list);
         FloatingActionButton fab_search = findViewById(R.id.fab_search);
 
@@ -570,33 +601,60 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         iStream.close();
 
         JSONObject reader = new JSONObject(info);
-        ArrayList<LocationInfo> searchData = new ArrayList<>();
         if (reader.getString("status").equals("OK")) {
             JSONArray resultArr = reader.getJSONArray("results");
 
             for (int i = 0; i < resultArr.length(); i++) {
                 JSONObject result = resultArr.getJSONObject(i);
-                JSONObject geometry = result.getJSONObject("geometry");
-                JSONObject location = geometry.getJSONObject("location");
 
-                name = result.getString("name");
-                address = result.getString("formatted_address");
-                lat = String.valueOf(location.getDouble("lat"));
-                lng = String.valueOf(location.getDouble("lng"));
+                if (type == 1) {
+                    JSONObject geometry = result.getJSONObject("geometry");
+                    JSONObject location = geometry.getJSONObject("location");
+                    name = result.getString("name");
+                    address = result.getString("formatted_address");
+                    lat = String.valueOf(location.getDouble("lat"));
+                    lng = String.valueOf(location.getDouble("lng"));
 
-                String[] fields = new String[4];
-                fields[0] = name;
-                fields[1] = address;
-                fields[2] = lat;
-                fields[3] = lng;
+                } else if (type == 2) {
+                    JSONArray tags = result.getJSONArray("types");
 
-                searchData.add(new LocationInfo(fields));
+                    // Ignore results with tag "lodging" or "political"
+                    if (tags.toString().contains("lodging") || tags.toString().contains("political")) {
+                        continue;
+                    }
+
+                    JSONObject geometry = result.getJSONObject("geometry");
+                    JSONObject location = geometry.getJSONObject("location");
+                    name = result.getString("name");
+                    address = result.getString("vicinity");
+                    lat = String.valueOf(location.getDouble("lat"));
+                    lng = String.valueOf(location.getDouble("lng"));
+                }
+
+                String[] fields = new String[5];
+                fields[0] = Integer.toString(type);
+                fields[1] = name;
+                fields[2] = address;
+                fields[3] = lat;
+                fields[4] = lng;
+
+                if (type == 1) {
+                    searchData.add(new LocationInfo(fields));
+                } else if (type == 2) {
+                    POISearchData.add(new LocationInfo(fields));
+                }
             }
 
-            // Create/Specify Adapters
-            RecyclerView.Adapter mAdapter = new MyAdapter(searchData);
-            location_list.setAdapter(mAdapter);
+            RecyclerView.Adapter mAdapterS = new MyAdapter(searchData);
+            RecyclerView.Adapter mAdapterP = new MyAdapter(POISearchData);
+
+            if (type == 1) {
+                location_list.setAdapter(mAdapterS);
+            } else { // type 2
+                location_list.setAdapter(mAdapterP);
+            }
             location_list.setVisibility(View.VISIBLE);
+
         } else {
             fab_search.setImageResource(android.R.drawable.ic_menu_search);
             AlertDialog.Builder ADbuilder = new AlertDialog.Builder(MapsActivity.this);
@@ -667,20 +725,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     // Functions to create markers that indicate the search centres
-    public void createPOISearchMarkers(LatLng current, LatLng destination) {
-        int points = 15; // Number of markers
-
+    public void createPOISearchCentres(LatLng current, LatLng destination) {
         double lat1 = current.latitude;
         double long1 = current.longitude;
-
         double lat2 = destination.latitude;
         double long2 = destination.longitude;
+
+        // Number of markers
+        int points = (int) (haversine(lat1, long1, lat2, long2) / 250) + 1;
+        if (points > 10) {
+           points = 10;
+        }
 
         double convertlat1 = convertLat(false, lat1);
         double convertlat2 = convertLat(false, lat2);
         double convertlong1 = convertLong(false, long1);
         double convertlong2 = convertLong(false, long2);
-
         double latChange = (convertlat2 - convertlat1) / (points + 1);
         double longChange = (convertlong2 - convertlong1) / (points + 1);
         double curLat = convertlat1;
@@ -691,7 +751,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             curLong += longChange;
 
             POISearchCentre = map.addMarker(new MarkerOptions().position(new LatLng(convertLat(true, curLat), convertLong(true, curLong))));
-            POISearchMarkers.add(POISearchCentre);
+            POISearchCentres.add(POISearchCentre);
+            POISearchCentre.remove();
         }
     }
 
@@ -718,6 +779,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             return latValue + 90;
         }
+    }
+
+    public static double haversine(double lat1, double lon1, double lat2, double lon2) {
+        double R = 6372.8; // km
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        lat1 = Math.toRadians(lat1);
+        lat2 = Math.toRadians(lat2);
+
+        double a = Math.pow(Math.sin(dLat / 2),2) + Math.pow(Math.sin(dLon / 2),2) * Math.cos(lat1) * Math.cos(lat2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        return R * c;
     }
 
 }

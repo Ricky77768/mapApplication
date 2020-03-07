@@ -5,21 +5,30 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class LocationInfo {
-    String name, address, lat, lng;
+    int type; // 1 = Initial Search, 2 = POI Search
+    String name, address, shortAddress, lat, lng;
     LatLng position;
     MarkerOptions markerOption;
     Marker locationMarker;
 
     public LocationInfo(String[] data) {
-        name = data[0];
-        address = data[1];
-        lat = data[2];
-        lng = data[3];
+        type = Integer.parseInt(data[0]);
+        name = data[1];
+        address = data[2];
+        lat = data[3];
+        lng = data[4];
+
+        shortAddress = address.substring(0, address.indexOf(","));
 
         position = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
-        markerOption = new MarkerOptions().position(position);
+        markerOption = new MarkerOptions().title(name).snippet(shortAddress).position(position);
         locationMarker = MapsActivity.map.addMarker(markerOption);
-        MapsActivity.searchMarkers.add(locationMarker);
+
+        if (type == 1) {
+            MapsActivity.searchMarkers.add(locationMarker);
+        } else if (type == 2) {
+            MapsActivity.POISearchMarkers.add(locationMarker);
+        }
     }
 
 }
