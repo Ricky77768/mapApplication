@@ -25,10 +25,4 @@
         <item>Hybird</item>
     </string-array>
 
-    <string-array name="search_radius">
-        <item>Small (10km)</item>
-        <item>Medium (25km)</item>
-        <item>Large (50km)</item>
-    </string-array>
-
 </resources>
