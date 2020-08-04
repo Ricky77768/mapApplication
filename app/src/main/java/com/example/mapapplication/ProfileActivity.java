@@ -59,6 +59,8 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+
+        // Save all profiles
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         sharedPref.edit().clear().commit();
@@ -76,6 +78,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        // Load all profiles
         Gson gson = new Gson();
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         int index = 0;

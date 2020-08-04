@@ -71,15 +71,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static ProfileInfo currentProfile;
     public static LatLng currentLocation;
     boolean canPutMarker = true;
-    int appState = 0;
-    /* The progress of app
-       0 = waiting for search
-       1 = waiting for destination selection
-       2 = waiting for POI selections
-     */
 
+    // 0 = Awaiting search
+    // 1 = Awaiting destination selection
+    // 2 = Awaiting POI selections
+    int appState = 0;
+
+    // Runs when the activity is created
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // Create activity's view
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_ui);
 
@@ -93,14 +95,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
         final FloatingActionButton fab_search = findViewById(R.id.fab_search);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        // Obtain SupportMapFragment and get notified when the map is ready
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
         // Initialize the map
         mapFragment.getMapAsync(this);
 
-        // Modify certain Views
+        // Modify certain view's initial state
         location_list.setVisibility(View.INVISIBLE);
         fab_marker_delete.setVisibility(View.INVISIBLE);
 
@@ -116,83 +118,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             loadProfile(currentProfile);
         }
 
-        // Click Listeners
+        // Click listeners
         profile_name.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                disableButtons(500);
                 Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
                 startActivity(intent);
-                profile_name.setEnabled(false);
-                button_profiles.setEnabled(false);
-                fab_settings.setEnabled(false);
-                fab_help.setEnabled(false);
-                button_profiles.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        profile_name.setEnabled(true);
-                        button_profiles.setEnabled(true);
-                        fab_settings.setEnabled(true);
-                        fab_help.setEnabled(true);
-                    }
-                }, 500);
             }
         });
 
         button_profiles.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                disableButtons(500);
                 Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
                 startActivity(intent);
-                profile_name.setEnabled(false);
-                button_profiles.setEnabled(false);
-                fab_settings.setEnabled(false);
-                fab_help.setEnabled(false);
-                button_profiles.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        profile_name.setEnabled(true);
-                        button_profiles.setEnabled(true);
-                        fab_settings.setEnabled(true);
-                        fab_help.setEnabled(true);
-                    }
-                }, 500);
             }
         });
 
         fab_settings.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                disableButtons(500);
                 Intent intent = new Intent(MapsActivity.this, SettingsActivity.class);
                 startActivity(intent);
-                profile_name.setEnabled(false);
-                button_profiles.setEnabled(false);
-                fab_settings.setEnabled(false);
-                fab_help.setEnabled(false);
-                button_profiles.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        profile_name.setEnabled(true);
-                        button_profiles.setEnabled(true);
-                        fab_settings.setEnabled(true);
-                        fab_help.setEnabled(true);
-                    }
-                }, 500);
             }
         });
 
         fab_help.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                profile_name.setEnabled(false);
-                button_profiles.setEnabled(false);
-                fab_settings.setEnabled(false);
-                fab_help.setEnabled(false);
-                button_profiles.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        profile_name.setEnabled(true);
-                        button_profiles.setEnabled(true);
-                        fab_settings.setEnabled(true);
-                        fab_help.setEnabled(true);
-                    }
-                }, 500);
-
+                disableButtons(500);
                 AlertDialog.Builder ADbuilder = new AlertDialog.Builder(MapsActivity.this);
                 ADbuilder.setMessage("Tap anywhere on a map to get search results nearby the dropped pin (if there are any). You can drag the marker around, and delete it using the garbage can button");
                 ADbuilder.setCancelable(true);
@@ -212,8 +165,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         fab_marker_delete.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                searchCenter.remove();
-                searchCenter = null;
+                if (searchCenter != null) {
+                    searchCenter.remove();
+                    searchCenter = null;
+                }
                 fab_marker_delete.setVisibility(View.INVISIBLE);
             }
         });
@@ -228,16 +183,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }, 500);
 
-                // Replace spaces in search input with %20 to support spaces in search term
-                String search_result = input_location.getText().toString();
-                search_result = search_result.trim();
-                search_result = search_result.replaceAll("\\s", "%20");
+                // Replace all spaces in input to match API call requirements
+                String search_input = input_location.getText().toString();
+                search_input = search_input.trim().replaceAll("\\s", "%20");
 
                 // Create Search URL
                 searchURL = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=";
-                searchURL += search_result;
+                searchURL += search_input;
+
+                // If the search centre pin is not used, use a default location (middle of ocean)
                 if (searchCenter == null) {
-                    // Dummy Location (In the middle of nowhere)
                     searchURL += "&location=35,-170";
                 } else {
                     searchURL += "&location=" + searchCenter.getPosition().latitude + "," + searchCenter.getPosition().longitude;
@@ -270,16 +225,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
-
     }
 
+    // Runs when the activity resumes from out of focus
     @Override
     protected void onResume() {
         super.onResume();
+
+        // References
         final TextView profile_name = findViewById(R.id.profile_name);
         final ImageButton button_profiles = findViewById(R.id.button_profiles);
 
-        // TODO: Fix - Profile only updates in real time when "selected" pressed
+        // Check which profile was previously selected and loads it
         for (ProfileInfo x : ProfileActivity.profiles) {
             if (x.selected) {
                 currentProfile = x;
@@ -288,10 +245,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         loadProfile(currentProfile);
     }
 
+    // Runs when the activity becomes out of focus
     @Override
     protected void onStop() {
         super.onStop();
 
+        // Save the currently selected profile
         for (ProfileInfo x : ProfileActivity.profiles) {
             if (x.selected) {
                 SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
@@ -304,15 +263,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    // Functions to change the activity based on current app state
     @Override
-    // Changes how the back button functions
     public void onBackPressed() {
+
+        // References
         RecyclerView location_list = findViewById(R.id.location_list);
         FloatingActionButton fab_search = findViewById(R.id.fab_search);
         FloatingActionButton fab_help = findViewById(R.id.fab_help);
         FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
         EditText input_location = findViewById(R.id.input_location);
 
+        // Awaiting POI selections
         if (appState == 2) {
             appState--;
             canPutMarker = true;
@@ -327,6 +289,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             fab_marker_delete.setVisibility(View.VISIBLE);
             input_location.setVisibility(View.VISIBLE);
 
+        // Awaiting destination selection
         } else if (appState == 1) {
             appState--;
             location_list.setVisibility(View.INVISIBLE);
@@ -337,6 +300,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             searchMarkers = new ArrayList<>();
             searchData = new ArrayList<>();
 
+        // Awaiting search
         } else if (appState == 0) {
             super.onBackPressed();
         }
@@ -352,11 +316,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
+        // Reference
+        final FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
+
+        // Initial setup of the map
         map = googleMap;
         map.setMyLocationEnabled(true);
         map.getUiSettings().setMapToolbarEnabled(false);
-        final FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
 
+        // If the user clicks on the map, a pin will be dropped
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             // Add a marker
@@ -367,12 +336,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (searchCenter != null) {
                     searchCenter.remove();
                 }
-                searchCenter = map.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                searchCenter = map.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
                 searchCenter.setDraggable(true);
                 fab_marker_delete.setVisibility(View.VISIBLE);
             }
         });
 
+        // Template functions on certain marker actions
         map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
             public void onMarkerDragStart(Marker marker) { }
@@ -390,6 +360,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Define a listener that responds to location updates
         LocationListener locationListener = new LocationListener() {
 
+            // Template functions on certain locationChange actions
             public void onLocationChanged(Location location) {
                 LatLng userLocation = new LatLng(location.getLatitude(),location.getLongitude());
                 currentLocation = userLocation;
@@ -414,14 +385,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         private ArrayList<LocationInfo> dataSet;
 
-        // Provide a reference to the views for each data item
-        // Complex data items may need more than one view per item, and
-        // you provide access to all the views for a data item in a view holder
+        // Provide a reference to the views for each data item. Complex data items may need more than one view per item
+        // You provide access to all the views for a data item in a view holder
         public class MyViewHolder extends RecyclerView.ViewHolder {
+
+            // Class variables
             public TextView location_name;
             public TextView location_otherinfo;
             public Button location_go;
 
+            // Find views
             public MyViewHolder(View v) {
                 super(v);
                 location_name = v.findViewById(R.id.location_name);
@@ -461,13 +434,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     }, 500);
 
-                    // TODO: Add button select functionality for POIS when ready
-                    // Temp solution
+                    // TODO: Once ready for POI selection, remove this temporary solution
                     if (appState != 1) { return; }
 
                     appState++;
                     canPutMarker = false;
 
+                    // References
                     final RecyclerView location_list = findViewById(R.id.location_list);
                     final EditText input_location = findViewById(R.id.input_location);
                     final FloatingActionButton fab_help = findViewById(R.id.fab_help);
@@ -500,18 +473,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         downloadFile.execute(searchURL);
                     }
 
-                    /* TODO List Below
-                     * - Confirm Location Screen here
-                     *      - Have ability to go back a
-                     *      - Have a way to change starting location
-                     *      - Have a way to get current LatLng
-                     * - For each POISearchPin, use nearby search radius 50km
-                     *      - Ignore places with "lodging" tag
-                     *      - Add places into based on user input RecycleView until 5-10 places are added per pin
-                     *      - Make sure to delete duplicates, ensure there is still 5-10 per pin
-                     * - Set Selected POIs as waypoints, find a path
-                     *      - Download the file here, then do something
-                     */
                 }
             });
 
@@ -589,6 +550,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Function to parse location search data (1 = initial search, 2 = POI search)
     public void parseSearchInfo(int type) throws Exception {
         String name = "", address = "", lat = "", lng = "";
+
+        // References
         RecyclerView location_list = findViewById(R.id.location_list);
         FloatingActionButton fab_search = findViewById(R.id.fab_search);
 
@@ -687,7 +650,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return sb.toString();
     }
 
-    // Load Profile
+    // Function to load a profile
     public void loadProfile(ProfileInfo x) {
         final TextView profile_name = findViewById(R.id.profile_name);
         final ImageButton button_profiles = findViewById(R.id.button_profiles);
@@ -697,11 +660,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             setIcon(currentProfile.icon);
             return;
         }
+
+        // Default case
         profile_name.setText("*No Profile Selected*");
         setIcon(-1);
     }
 
-    // Set Icon
+    // Function to set the icon for a profile
     public void setIcon(int index) {
         final ImageButton button_profiles = findViewById(R.id.button_profiles);
 
@@ -724,19 +689,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    // Functions to create markers that indicate the search centres
+    // Function to create POI search centre markers
     public void createPOISearchCentres(LatLng current, LatLng destination) {
         double lat1 = current.latitude;
         double long1 = current.longitude;
         double lat2 = destination.latitude;
         double long2 = destination.longitude;
 
-        // Number of markers
+        // Compute the number of markers based on distance
         int points = (int) (haversine(lat1, long1, lat2, long2) / 250) + 1;
         if (points > 10) {
            points = 10;
         }
 
+        // Compute the distance between each POI search centre marker
         double convertlat1 = convertLat(false, lat1);
         double convertlat2 = convertLat(false, lat2);
         double convertlong1 = convertLong(false, long1);
@@ -746,6 +712,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         double curLat = convertlat1;
         double curLong = convertlong1;
 
+        // Create the POI search centre markers
         for (int i = 0; i < points; i++) {
             curLat += latChange;
             curLong += longChange;
@@ -756,6 +723,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    // Function to convert longitude values for easier calculation
     public static double convertLong(boolean toStandard, double longValue) {
         if (toStandard) {
             if (longValue > 180) {
@@ -773,6 +741,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    // Function to convert latitude values for easier calculation
     public static double convertLat(boolean toStandard, double latValue) {
         if (toStandard) {
             return latValue - 90;
@@ -781,6 +750,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    // Function to calcualte distance between for pairs of coordinates
     public static double haversine(double lat1, double lon1, double lat2, double lon2) {
         double R = 6372.8; // km
         double dLat = Math.toRadians(lat2 - lat1);
@@ -791,6 +761,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         double a = Math.pow(Math.sin(dLat / 2),2) + Math.pow(Math.sin(dLon / 2),2) * Math.cos(lat1) * Math.cos(lat2);
         double c = 2 * Math.asin(Math.sqrt(a));
         return R * c;
+    }
+
+    // Function to disable certain buttons for a brief period to prevent multiple triggers
+    public void disableButtons(int millis) {
+
+        // References
+        final TextView profile_name = findViewById(R.id.profile_name);
+        final ImageButton button_profiles = findViewById(R.id.button_profiles);
+        final FloatingActionButton fab_settings = findViewById(R.id.fab_settings);
+        final FloatingActionButton fab_help = findViewById(R.id.fab_help);
+
+        profile_name.setEnabled(false);
+        button_profiles.setEnabled(false);
+        fab_settings.setEnabled(false);
+        fab_help.setEnabled(false);
+        button_profiles.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                profile_name.setEnabled(true);
+                button_profiles.setEnabled(true);
+                fab_settings.setEnabled(true);
+                fab_help.setEnabled(true);
+            }
+        }, millis);
     }
 
 }

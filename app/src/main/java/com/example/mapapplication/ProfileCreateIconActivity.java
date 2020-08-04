@@ -15,11 +15,13 @@ public class ProfileCreateIconActivity extends AppCompatActivity {
         setContentView(R.layout.profile_create_icon_ui);
         getSupportActionBar().setTitle("Choose an Icon");
 
+        // References
         ImageButton profile_create_icon_select1 = findViewById(R.id.profile_create_icon_select1);
         ImageButton profile_create_icon_select2 = findViewById(R.id.profile_create_icon_select2);
         ImageButton profile_create_icon_select3 = findViewById(R.id.profile_create_icon_select3);
         ImageButton profile_create_icon_select4 = findViewById(R.id.profile_create_icon_select4);
 
+        // Click listeners
         profile_create_icon_select1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent returnIntent = new Intent();
