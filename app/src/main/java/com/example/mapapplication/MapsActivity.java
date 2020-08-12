@@ -462,6 +462,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     fab_marker_delete.setVisibility(View.INVISIBLE);
                     input_location.setVisibility(View.INVISIBLE);
 
+                    // Reset array to prevent duplication
+                    POISearchCentres = new ArrayList<>();
                     createPOISearchCentres(currentLocation, coordinates);
 
                     for (int i = 0; i < POISearchCentres.size(); i++) {
@@ -504,9 +506,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         8192);
 
                 // Output stream
-                OutputStream output = new FileOutputStream(Environment
-                        .getExternalStorageDirectory().toString()
-                        + "/search_data.json", false);
+                OutputStream output = new FileOutputStream(getApplicationContext().getFilesDir().toString() + "/search_data.json", false);
 
                 byte[] data = new byte[1024];
                 long total = 0;
@@ -556,9 +556,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         FloatingActionButton fab_search = findViewById(R.id.fab_search);
 
         // Convert file to JSON String
-        File dir = Environment.getExternalStorageDirectory();
-        String path = dir.getAbsolutePath();
-        File data = new File(path + "/search_data.json");
+        File data = new File(getApplicationContext().getFilesDir().toString() + "/search_data.json");
         FileInputStream iStream = new FileInputStream(data);
         String info = convertStreamToString(iStream);
         iStream.close();
