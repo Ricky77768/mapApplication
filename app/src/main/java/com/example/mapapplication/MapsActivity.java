@@ -88,10 +88,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // References
         final RecyclerView location_list = findViewById(R.id.location_list);
         final EditText input_location = findViewById(R.id.input_location);
+        final TextView search_tip = findViewById(R.id.search_tip);
         final TextView profile_name = findViewById(R.id.profile_name);
         final ImageButton button_profiles = findViewById(R.id.button_profiles);
         final FloatingActionButton fab_settings = findViewById(R.id.fab_settings);
-        final FloatingActionButton fab_help = findViewById(R.id.fab_help);
         final FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
         final FloatingActionButton fab_search = findViewById(R.id.fab_search);
 
@@ -105,6 +105,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Modify certain view's initial state
         location_list.setVisibility(View.INVISIBLE);
         fab_marker_delete.setVisibility(View.INVISIBLE);
+        search_tip.setVisibility(View.INVISIBLE);
 
         // Load previously selected profile
         Gson gson = new Gson();
@@ -140,26 +141,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 disableButtons(500);
                 Intent intent = new Intent(MapsActivity.this, SettingsActivity.class);
                 startActivity(intent);
-            }
-        });
-
-        fab_help.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                disableButtons(500);
-                AlertDialog.Builder ADbuilder = new AlertDialog.Builder(MapsActivity.this);
-                ADbuilder.setMessage("Tap anywhere on a map to get search results nearby the dropped pin (if there are any). You can drag the marker around, and delete it using the garbage can button");
-                ADbuilder.setCancelable(true);
-
-                ADbuilder.setPositiveButton(
-                        "Ok",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-
-                AlertDialog alert = ADbuilder.create();
-                alert.show();
             }
         });
 
@@ -270,9 +251,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // References
         RecyclerView location_list = findViewById(R.id.location_list);
         FloatingActionButton fab_search = findViewById(R.id.fab_search);
-        FloatingActionButton fab_help = findViewById(R.id.fab_help);
         FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
         EditText input_location = findViewById(R.id.input_location);
+        TextView search_tip = findViewById(R.id.search_tip);
 
         // Awaiting POI selections
         if (appState == 2) {
@@ -284,7 +265,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             for (Marker x : POISearchMarkers) { x.remove(); }
             POISearchMarkers = new ArrayList<>();
             POISearchData = new ArrayList<>();
-            fab_help.setVisibility(View.VISIBLE);
+            search_tip.setVisibility(View.VISIBLE);
             fab_search.setVisibility(View.VISIBLE);
             fab_marker_delete.setVisibility(View.VISIBLE);
             input_location.setVisibility(View.VISIBLE);
@@ -292,6 +273,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Awaiting destination selection
         } else if (appState == 1) {
             appState--;
+            search_tip.setVisibility(View.INVISIBLE);
             location_list.setVisibility(View.INVISIBLE);
             fab_search.setImageResource(android.R.drawable.ic_menu_search);
             for (Marker x : searchMarkers) {
@@ -421,11 +403,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public void onBindViewHolder(final MyViewHolder holder, int position) {
             holder.location_name.setText(dataSet.get(position).name);
             holder.location_otherinfo.setText(dataSet.get(position).address);
+
             holder.location_go.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View view) {
-
                     holder.location_go.setEnabled(false);
                     holder.location_go.postDelayed(new Runnable() {
                         @Override
@@ -434,18 +416,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     }, 500);
 
+                    // References
+                    final RecyclerView location_list = findViewById(R.id.location_list);
+                    final EditText input_location = findViewById(R.id.input_location);
+                    final FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
+                    final FloatingActionButton fab_search = findViewById(R.id.fab_search);
+                    final TextView search_tip = findViewById(R.id.search_tip);
+
                     // TODO: Once ready for POI selection, remove this temporary solution
                     if (appState != 1) { return; }
 
                     appState++;
                     canPutMarker = false;
 
-                    // References
-                    final RecyclerView location_list = findViewById(R.id.location_list);
-                    final EditText input_location = findViewById(R.id.input_location);
-                    final FloatingActionButton fab_help = findViewById(R.id.fab_help);
-                    final FloatingActionButton fab_marker_delete = findViewById(R.id.fab_marker_delete);
-                    final FloatingActionButton fab_search = findViewById(R.id.fab_search);
+                    // Remove search tip
+                    search_tip.setVisibility(View.INVISIBLE);
 
                     LatLng coordinates = new LatLng(Double.parseDouble(dataSet.get(holder.getAdapterPosition()).lat), Double.parseDouble(dataSet.get(holder.getAdapterPosition()).lng));
                     originalDestination = map.addMarker(new MarkerOptions().position(coordinates));
@@ -457,7 +442,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         x.setVisible(false);
                     }
 
-                    fab_help.setVisibility(View.INVISIBLE);
                     fab_search.setVisibility(View.INVISIBLE);
                     fab_marker_delete.setVisibility(View.INVISIBLE);
                     input_location.setVisibility(View.INVISIBLE);
@@ -552,8 +536,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String name = "", address = "", lat = "", lng = "";
 
         // References
+        TextView search_tip = findViewById(R.id.search_tip);
         RecyclerView location_list = findViewById(R.id.location_list);
         FloatingActionButton fab_search = findViewById(R.id.fab_search);
+
+        // Display search tip if needed
+        if (type == 1) {
+            if (searchCenter == null) {
+                search_tip.setText(R.string.search_tip1);
+            } else {
+                search_tip.setText(R.string.search_tip2);
+            }
+            search_tip.setVisibility(View.VISIBLE);
+        }
 
         // Convert file to JSON String
         File data = new File(getApplicationContext().getFilesDir().toString() + "/search_data.json");
@@ -768,19 +763,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final TextView profile_name = findViewById(R.id.profile_name);
         final ImageButton button_profiles = findViewById(R.id.button_profiles);
         final FloatingActionButton fab_settings = findViewById(R.id.fab_settings);
-        final FloatingActionButton fab_help = findViewById(R.id.fab_help);
 
         profile_name.setEnabled(false);
         button_profiles.setEnabled(false);
         fab_settings.setEnabled(false);
-        fab_help.setEnabled(false);
         button_profiles.postDelayed(new Runnable() {
             @Override
             public void run() {
                 profile_name.setEnabled(true);
                 button_profiles.setEnabled(true);
                 fab_settings.setEnabled(true);
-                fab_help.setEnabled(true);
             }
         }, millis);
     }
