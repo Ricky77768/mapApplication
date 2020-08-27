@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class ProfileCreateActivity extends AppCompatActivity {
-    int icon = 1; // For icon selection
+    static int icon = 1; // For icon selection
     final int SELECT_ICON = 1;
 
     // For passing data to ProfileActivity
@@ -166,27 +166,8 @@ public class ProfileCreateActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == SELECT_ICON && resultCode == RESULT_OK) {
-            ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
             int icon_number = data.getIntExtra("icon_number", 1);
-
-            switch (icon_number) {
-                case 1:
-                    icon = 1;
-                    profile_create_icon.setImageResource(R.drawable.profile_icon_food);
-                    break;
-                case 2:
-                    icon = 2;
-                    profile_create_icon.setImageResource(R.drawable.profile_icon_sports);
-                    break;
-                case 3:
-                    icon = 3;
-                    profile_create_icon.setImageResource(R.drawable.profile_icon_nightlife);
-                    break;
-                case 4:
-                    icon = 4;
-                    profile_create_icon.setImageResource(R.drawable.profile_icon_sightseeing);
-                    break;
-            }
+            setIcon(icon_number);
         }
 
     }
@@ -318,29 +299,175 @@ public class ProfileCreateActivity extends AppCompatActivity {
             }
         }
         setIcon(passedData.getIntExtra("P_edit_icon", -1));
-
     }
 
     // Set Icon
     public void setIcon(int index) {
         final ImageView profile_create_icon = findViewById(R.id.profile_create_icon);
+        icon = index;
 
         switch (index) {
             case 1:
-                icon = 1;
-                profile_create_icon.setImageResource(R.drawable.profile_icon_food);
+                profile_create_icon.setImageResource(R.drawable.air_balloon);
                 break;
             case 2:
-                icon = 2;
-                profile_create_icon.setImageResource(R.drawable.profile_icon_sports);
+                profile_create_icon.setImageResource(R.drawable.aircraft);
                 break;
             case 3:
-                icon = 3;
-                profile_create_icon.setImageResource(R.drawable.profile_icon_nightlife);
+                profile_create_icon.setImageResource(R.drawable.anchor);
                 break;
             case 4:
-                icon = 4;
-                profile_create_icon.setImageResource(R.drawable.profile_icon_sightseeing);
+                profile_create_icon.setImageResource(R.drawable.ancient_temple);
+                break;
+            case 5:
+                profile_create_icon.setImageResource(R.drawable.bag);
+                break;
+            case 6:
+                profile_create_icon.setImageResource(R.drawable.baggage);
+                break;
+            case 7:
+                profile_create_icon.setImageResource(R.drawable.barbeque);
+                break;
+            case 8:
+                profile_create_icon.setImageResource(R.drawable.beach_shoes);
+                break;
+            case 9:
+                profile_create_icon.setImageResource(R.drawable.bed);
+                break;
+            case 10:
+                profile_create_icon.setImageResource(R.drawable.binocular);
+                break;
+            case 11:
+                profile_create_icon.setImageResource(R.drawable.bird);
+                break;
+            case 12:
+                profile_create_icon.setImageResource(R.drawable.boat);
+                break;
+            case 13:
+                profile_create_icon.setImageResource(R.drawable.bycicle);
+                break;
+            case 14:
+                profile_create_icon.setImageResource(R.drawable.cafe);
+                break;
+            case 15:
+                profile_create_icon.setImageResource(R.drawable.call_bell);
+                break;
+            case 16:
+                profile_create_icon.setImageResource(R.drawable.camera);
+                break;
+            case 17:
+                profile_create_icon.setImageResource(R.drawable.campfire);
+                break;
+            case 18:
+                profile_create_icon.setImageResource(R.drawable.camping);
+                break;
+            case 19:
+                profile_create_icon.setImageResource(R.drawable.car);
+                break;
+            case 20:
+                profile_create_icon.setImageResource(R.drawable.cocktail);
+                break;
+            case 21:
+                profile_create_icon.setImageResource(R.drawable.compass);
+                break;
+            case 22:
+                profile_create_icon.setImageResource(R.drawable.credit_card);
+                break;
+            case 23:
+                profile_create_icon.setImageResource(R.drawable.cruise);
+                break;
+            case 24:
+                profile_create_icon.setImageResource(R.drawable.currency_exchange);
+                break;
+            case 25:
+                profile_create_icon.setImageResource(R.drawable.direction);
+                break;
+            case 26:
+                profile_create_icon.setImageResource(R.drawable.diving);
+                break;
+            case 27:
+                profile_create_icon.setImageResource(R.drawable.documents);
+                break;
+            case 28:
+                profile_create_icon.setImageResource(R.drawable.dolphin);
+                break;
+            case 29:
+                profile_create_icon.setImageResource(R.drawable.earth);
+                break;
+            case 30:
+                profile_create_icon.setImageResource(R.drawable.exotic_food);
+                break;
+            case 31:
+                profile_create_icon.setImageResource(R.drawable.gopro);
+                break;
+            case 32:
+                profile_create_icon.setImageResource(R.drawable.guide);
+                break;
+            case 33:
+                profile_create_icon.setImageResource(R.drawable.guitar);
+                break;
+            case 34:
+                profile_create_icon.setImageResource(R.drawable.hang_glider);
+                break;
+            case 35:
+                profile_create_icon.setImageResource(R.drawable.hotel);
+                break;
+            case 36:
+                profile_create_icon.setImageResource(R.drawable.island);
+                break;
+            case 37:
+                profile_create_icon.setImageResource(R.drawable.lantern);
+                break;
+            case 38:
+                profile_create_icon.setImageResource(R.drawable.lighthouse);
+                break;
+            case 39:
+                profile_create_icon.setImageResource(R.drawable.map);
+                break;
+            case 40:
+                profile_create_icon.setImageResource(R.drawable.marine_star);
+                break;
+            case 41:
+                profile_create_icon.setImageResource(R.drawable.mountains);
+                break;
+            case 42:
+                profile_create_icon.setImageResource(R.drawable.photo_cards);
+                break;
+            case 43:
+                profile_create_icon.setImageResource(R.drawable.picnic);
+                break;
+            case 44:
+                profile_create_icon.setImageResource(R.drawable.plane);
+                break;
+            case 45:
+                profile_create_icon.setImageResource(R.drawable.pool);
+                break;
+            case 46:
+                profile_create_icon.setImageResource(R.drawable.quadcopter);
+                break;
+            case 47:
+                profile_create_icon.setImageResource(R.drawable.shoes);
+                break;
+            case 48:
+                profile_create_icon.setImageResource(R.drawable.shopping);
+                break;
+            case 49:
+                profile_create_icon.setImageResource(R.drawable.sun);
+                break;
+            case 50:
+                profile_create_icon.setImageResource(R.drawable.sun_protection);
+                break;
+            case 51:
+                profile_create_icon.setImageResource(R.drawable.sunglasses);
+                break;
+            case 52:
+                profile_create_icon.setImageResource(R.drawable.tickets);
+                break;
+            case 53:
+                profile_create_icon.setImageResource(R.drawable.trailer);
+                break;
+            case 54:
+                profile_create_icon.setImageResource(R.drawable.train);
                 break;
         }
     }

@@ -665,16 +665,166 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         switch (index) {
             case 1:
-                button_profiles.setImageResource(R.drawable.profile_icon_food);
+                button_profiles.setImageResource(R.drawable.air_balloon);
                 break;
             case 2:
-                button_profiles.setImageResource(R.drawable.profile_icon_sports);
+                button_profiles.setImageResource(R.drawable.aircraft);
                 break;
             case 3:
-                button_profiles.setImageResource(R.drawable.profile_icon_nightlife);
+                button_profiles.setImageResource(R.drawable.anchor);
                 break;
             case 4:
-                button_profiles.setImageResource(R.drawable.profile_icon_sightseeing);
+                button_profiles.setImageResource(R.drawable.ancient_temple);
+                break;
+            case 5:
+                button_profiles.setImageResource(R.drawable.bag);
+                break;
+            case 6:
+                button_profiles.setImageResource(R.drawable.baggage);
+                break;
+            case 7:
+                button_profiles.setImageResource(R.drawable.barbeque);
+                break;
+            case 8:
+                button_profiles.setImageResource(R.drawable.beach_shoes);
+                break;
+            case 9:
+                button_profiles.setImageResource(R.drawable.bed);
+                break;
+            case 10:
+                button_profiles.setImageResource(R.drawable.binocular);
+                break;
+            case 11:
+                button_profiles.setImageResource(R.drawable.bird);
+                break;
+            case 12:
+                button_profiles.setImageResource(R.drawable.boat);
+                break;
+            case 13:
+                button_profiles.setImageResource(R.drawable.bycicle);
+                break;
+            case 14:
+                button_profiles.setImageResource(R.drawable.cafe);
+                break;
+            case 15:
+                button_profiles.setImageResource(R.drawable.call_bell);
+                break;
+            case 16:
+                button_profiles.setImageResource(R.drawable.camera);
+                break;
+            case 17:
+                button_profiles.setImageResource(R.drawable.campfire);
+                break;
+            case 18:
+                button_profiles.setImageResource(R.drawable.camping);
+                break;
+            case 19:
+                button_profiles.setImageResource(R.drawable.car);
+                break;
+            case 20:
+                button_profiles.setImageResource(R.drawable.cocktail);
+                break;
+            case 21:
+                button_profiles.setImageResource(R.drawable.compass);
+                break;
+            case 22:
+                button_profiles.setImageResource(R.drawable.credit_card);
+                break;
+            case 23:
+                button_profiles.setImageResource(R.drawable.cruise);
+                break;
+            case 24:
+                button_profiles.setImageResource(R.drawable.currency_exchange);
+                break;
+            case 25:
+                button_profiles.setImageResource(R.drawable.direction);
+                break;
+            case 26:
+                button_profiles.setImageResource(R.drawable.diving);
+                break;
+            case 27:
+                button_profiles.setImageResource(R.drawable.documents);
+                break;
+            case 28:
+                button_profiles.setImageResource(R.drawable.dolphin);
+                break;
+            case 29:
+                button_profiles.setImageResource(R.drawable.earth);
+                break;
+            case 30:
+                button_profiles.setImageResource(R.drawable.exotic_food);
+                break;
+            case 31:
+                button_profiles.setImageResource(R.drawable.gopro);
+                break;
+            case 32:
+                button_profiles.setImageResource(R.drawable.guide);
+                break;
+            case 33:
+                button_profiles.setImageResource(R.drawable.guitar);
+                break;
+            case 34:
+                button_profiles.setImageResource(R.drawable.hang_glider);
+                break;
+            case 35:
+                button_profiles.setImageResource(R.drawable.hotel);
+                break;
+            case 36:
+                button_profiles.setImageResource(R.drawable.island);
+                break;
+            case 37:
+                button_profiles.setImageResource(R.drawable.lantern);
+                break;
+            case 38:
+                button_profiles.setImageResource(R.drawable.lighthouse);
+                break;
+            case 39:
+                button_profiles.setImageResource(R.drawable.map);
+                break;
+            case 40:
+                button_profiles.setImageResource(R.drawable.marine_star);
+                break;
+            case 41:
+                button_profiles.setImageResource(R.drawable.mountains);
+                break;
+            case 42:
+                button_profiles.setImageResource(R.drawable.photo_cards);
+                break;
+            case 43:
+                button_profiles.setImageResource(R.drawable.picnic);
+                break;
+            case 44:
+                button_profiles.setImageResource(R.drawable.plane);
+                break;
+            case 45:
+                button_profiles.setImageResource(R.drawable.pool);
+                break;
+            case 46:
+                button_profiles.setImageResource(R.drawable.quadcopter);
+                break;
+            case 47:
+                button_profiles.setImageResource(R.drawable.shoes);
+                break;
+            case 48:
+                button_profiles.setImageResource(R.drawable.shopping);
+                break;
+            case 49:
+                button_profiles.setImageResource(R.drawable.sun);
+                break;
+            case 50:
+                button_profiles.setImageResource(R.drawable.sun_protection);
+                break;
+            case 51:
+                button_profiles.setImageResource(R.drawable.sunglasses);
+                break;
+            case 52:
+                button_profiles.setImageResource(R.drawable.tickets);
+                break;
+            case 53:
+                button_profiles.setImageResource(R.drawable.trailer);
+                break;
+            case 54:
+                button_profiles.setImageResource(R.drawable.train);
                 break;
             default:
                 button_profiles.setImageResource(R.mipmap.ic_launcher_round);

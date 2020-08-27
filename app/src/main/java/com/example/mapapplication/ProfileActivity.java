@@ -183,21 +183,7 @@ public class ProfileActivity extends AppCompatActivity {
                 tags_description += x + ", ";
             }
             holder.profile_list_tags.setText(tags_description);
-
-            switch (data.get(position).icon) {
-                case 1:
-                    holder.profile_list_picture.setImageResource(R.drawable.profile_icon_food);
-                    break;
-                case 2:
-                    holder.profile_list_picture.setImageResource(R.drawable.profile_icon_sports);
-                    break;
-                case 3:
-                    holder.profile_list_picture.setImageResource(R.drawable.profile_icon_nightlife);
-                    break;
-                case 4:
-                    holder.profile_list_picture.setImageResource(R.drawable.profile_icon_sightseeing);
-                    break;
-            }
+            setIcon(data.get(position).icon, holder);
 
             // Disables select profile button if already selected
             if (data.get(position).selected) { holder.profile_list_select.setEnabled(false); }
@@ -306,6 +292,174 @@ public class ProfileActivity extends AppCompatActivity {
             return data.size();
         }
 
+    }
+
+    // Set Icon
+    public void setIcon(int index, ProfileActivity.MyAdapter.MyViewHolder holder) {
+        switch (index) {
+            case 1:
+                holder.profile_list_picture.setImageResource(R.drawable.air_balloon);
+                break;
+            case 2:
+                holder.profile_list_picture.setImageResource(R.drawable.aircraft);
+                break;
+            case 3:
+                holder.profile_list_picture.setImageResource(R.drawable.anchor);
+                break;
+            case 4:
+                holder.profile_list_picture.setImageResource(R.drawable.ancient_temple);
+                break;
+            case 5:
+                holder.profile_list_picture.setImageResource(R.drawable.bag);
+                break;
+            case 6:
+                holder.profile_list_picture.setImageResource(R.drawable.baggage);
+                break;
+            case 7:
+                holder.profile_list_picture.setImageResource(R.drawable.barbeque);
+                break;
+            case 8:
+                holder.profile_list_picture.setImageResource(R.drawable.beach_shoes);
+                break;
+            case 9:
+                holder.profile_list_picture.setImageResource(R.drawable.bed);
+                break;
+            case 10:
+                holder.profile_list_picture.setImageResource(R.drawable.binocular);
+                break;
+            case 11:
+                holder.profile_list_picture.setImageResource(R.drawable.bird);
+                break;
+            case 12:
+                holder.profile_list_picture.setImageResource(R.drawable.boat);
+                break;
+            case 13:
+                holder.profile_list_picture.setImageResource(R.drawable.bycicle);
+                break;
+            case 14:
+                holder.profile_list_picture.setImageResource(R.drawable.cafe);
+                break;
+            case 15:
+                holder.profile_list_picture.setImageResource(R.drawable.call_bell);
+                break;
+            case 16:
+                holder.profile_list_picture.setImageResource(R.drawable.camera);
+                break;
+            case 17:
+                holder.profile_list_picture.setImageResource(R.drawable.campfire);
+                break;
+            case 18:
+                holder.profile_list_picture.setImageResource(R.drawable.camping);
+                break;
+            case 19:
+                holder.profile_list_picture.setImageResource(R.drawable.car);
+                break;
+            case 20:
+                holder.profile_list_picture.setImageResource(R.drawable.cocktail);
+                break;
+            case 21:
+                holder.profile_list_picture.setImageResource(R.drawable.compass);
+                break;
+            case 22:
+                holder.profile_list_picture.setImageResource(R.drawable.credit_card);
+                break;
+            case 23:
+                holder.profile_list_picture.setImageResource(R.drawable.cruise);
+                break;
+            case 24:
+                holder.profile_list_picture.setImageResource(R.drawable.currency_exchange);
+                break;
+            case 25:
+                holder.profile_list_picture.setImageResource(R.drawable.direction);
+                break;
+            case 26:
+                holder.profile_list_picture.setImageResource(R.drawable.diving);
+                break;
+            case 27:
+                holder.profile_list_picture.setImageResource(R.drawable.documents);
+                break;
+            case 28:
+                holder.profile_list_picture.setImageResource(R.drawable.dolphin);
+                break;
+            case 29:
+                holder.profile_list_picture.setImageResource(R.drawable.earth);
+                break;
+            case 30:
+                holder.profile_list_picture.setImageResource(R.drawable.exotic_food);
+                break;
+            case 31:
+                holder.profile_list_picture.setImageResource(R.drawable.gopro);
+                break;
+            case 32:
+                holder.profile_list_picture.setImageResource(R.drawable.guide);
+                break;
+            case 33:
+                holder.profile_list_picture.setImageResource(R.drawable.guitar);
+                break;
+            case 34:
+                holder.profile_list_picture.setImageResource(R.drawable.hang_glider);
+                break;
+            case 35:
+                holder.profile_list_picture.setImageResource(R.drawable.hotel);
+                break;
+            case 36:
+                holder.profile_list_picture.setImageResource(R.drawable.island);
+                break;
+            case 37:
+                holder.profile_list_picture.setImageResource(R.drawable.lantern);
+                break;
+            case 38:
+                holder.profile_list_picture.setImageResource(R.drawable.lighthouse);
+                break;
+            case 39:
+                holder.profile_list_picture.setImageResource(R.drawable.map);
+                break;
+            case 40:
+                holder.profile_list_picture.setImageResource(R.drawable.marine_star);
+                break;
+            case 41:
+                holder.profile_list_picture.setImageResource(R.drawable.mountains);
+                break;
+            case 42:
+                holder.profile_list_picture.setImageResource(R.drawable.photo_cards);
+                break;
+            case 43:
+                holder.profile_list_picture.setImageResource(R.drawable.picnic);
+                break;
+            case 44:
+                holder.profile_list_picture.setImageResource(R.drawable.plane);
+                break;
+            case 45:
+                holder.profile_list_picture.setImageResource(R.drawable.pool);
+                break;
+            case 46:
+                holder.profile_list_picture.setImageResource(R.drawable.quadcopter);
+                break;
+            case 47:
+                holder.profile_list_picture.setImageResource(R.drawable.shoes);
+                break;
+            case 48:
+                holder.profile_list_picture.setImageResource(R.drawable.shopping);
+                break;
+            case 49:
+                holder.profile_list_picture.setImageResource(R.drawable.sun);
+                break;
+            case 50:
+                holder.profile_list_picture.setImageResource(R.drawable.sun_protection);
+                break;
+            case 51:
+                holder.profile_list_picture.setImageResource(R.drawable.sunglasses);
+                break;
+            case 52:
+                holder.profile_list_picture.setImageResource(R.drawable.tickets);
+                break;
+            case 53:
+                holder.profile_list_picture.setImageResource(R.drawable.trailer);
+                break;
+            case 54:
+                holder.profile_list_picture.setImageResource(R.drawable.train);
+                break;
+        }
     }
 
 }
