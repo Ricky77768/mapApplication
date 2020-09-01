@@ -18,7 +18,7 @@ public class LocationInfo {
         lat = data[3];
         lng = data[4];
 
-        shortAddress = address.substring(0, address.indexOf(","));
+        shortAddress = address;
         position = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
         markerOption = new MarkerOptions().title(name).snippet(shortAddress).position(position);
         locationMarker = MapsActivity.map.addMarker(markerOption);

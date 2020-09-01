@@ -16,6 +16,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -106,6 +107,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         location_list.setVisibility(View.INVISIBLE);
         fab_marker_delete.setVisibility(View.INVISIBLE);
         search_tip.setVisibility(View.INVISIBLE);
+        location_list.setFocusable(false);
 
         // Load previously selected profile
         Gson gson = new Gson();
@@ -525,7 +527,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             try {
                 parseSearchInfo(type);
             } catch (Exception e) {
-                Log.e("Ricky", e.getMessage());
+                e.printStackTrace();
             }
         }
 
@@ -576,6 +578,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     // Ignore results with tag "lodging" or "political"
                     if (tags.toString().contains("lodging") || tags.toString().contains("political")) {
+                        Log.e("Ricky", "Illogical Tag Detected");
                         continue;
                     }
 

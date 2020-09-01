@@ -10,6 +10,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +32,7 @@ public class ProfileActivity extends AppCompatActivity {
     final int EDIT_PROFILE = 3;
     public static ArrayList<ProfileInfo> profiles = new ArrayList<>();
     RecyclerView.Adapter mAdapter = new ProfileActivity.MyAdapter(profiles);
+    Bundle recyclerViewState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +63,12 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
 
+        // Save recycler view scroll state
+        recyclerViewState = new Bundle();
+        RecyclerView profile_list = findViewById(R.id.profile_list);
+        Parcelable mListState = profile_list.getLayoutManager().onSaveInstanceState();
+        recyclerViewState.putParcelable("recycler_view_state", mListState);
+
         // Save all profiles
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -78,6 +87,17 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        // Load recycler view scroll state
+        final RecyclerView profile_list = findViewById(R.id.profile_list);
+        if (recyclerViewState != null) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    profile_list.getLayoutManager().onRestoreInstanceState(recyclerViewState.getParcelable("recycler_view_state"));
+                }
+            }, 10);
+        }
+
         // Load all profiles
         Gson gson = new Gson();
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
@@ -91,8 +111,6 @@ public class ProfileActivity extends AppCompatActivity {
             profiles.add(gson.fromJson(profile, ProfileInfo.class));
             index++;
         }
-
-        RecyclerView profile_list = findViewById(R.id.profile_list);
         profile_list.setHasFixedSize(false);
 
         // Check if the function is triggered by a "profile create" or "profile edit" or screen refresh

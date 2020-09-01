@@ -145,7 +145,7 @@
         android:scaleType="fitCenter"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_create_cancel"
-        app:srcCompat="@drawable/car" />
+        app:srcCompat="@drawable/air_balloon" />
 
     <SeekBar
         android:id="@+id/profile_create_seekbar_numOfPlaces"

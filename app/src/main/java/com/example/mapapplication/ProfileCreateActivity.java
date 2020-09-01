@@ -62,6 +62,7 @@ public class ProfileCreateActivity extends AppCompatActivity {
         final ChipGroup profile_create_chipgroup = findViewById(R.id.profile_create_chipgroup);
 
         // Click Listeners
+        setIcon(icon);
         profile_create_save.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 profile_create_save.setEnabled(false);
