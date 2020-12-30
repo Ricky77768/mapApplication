@@ -271,6 +271,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             fab_search.setVisibility(View.VISIBLE);
             fab_marker_delete.setVisibility(View.VISIBLE);
             input_location.setVisibility(View.VISIBLE);
+            RecyclerView.Adapter mAdapterS = new MyAdapter(searchData);
+            location_list.setAdapter(mAdapterS);
 
         // Awaiting destination selection
         } else if (appState == 1) {
@@ -410,6 +412,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 @Override
                 public void onClick(View view) {
+
+                    // TODO: Add pause screen here
+
                     holder.location_go.setEnabled(false);
                     holder.location_go.postDelayed(new Runnable() {
                         @Override
@@ -460,6 +465,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         DownloadFile downloadFile = new DownloadFile(2);
                         downloadFile.execute(searchURL);
                     }
+
+                    // TODO: Write Method to Remove Duplicates (Using placeID?)
 
                 }
             });
