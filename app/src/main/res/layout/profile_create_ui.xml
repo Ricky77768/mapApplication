@@ -17,7 +17,7 @@
         app:layout_constraintTop_toBottomOf="@+id/profile_create_text2">
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip"
+            android:id="@+id/chip_attractions"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -26,7 +26,16 @@
             app:chipBackgroundColor="@color/chip_bg_colors" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip2"
+            android:id="@+id/chip_agencies"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Agencies"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:chipBackgroundColor="@color/chip_bg_colors" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_education"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -35,7 +44,7 @@
             app:chipBackgroundColor="@color/chip_bg_colors" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip3"
+            android:id="@+id/chip_entertainment"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -44,7 +53,7 @@
             app:chipBackgroundColor="@color/chip_bg_colors" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip4"
+            android:id="@+id/chip_food_drinks"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -53,7 +62,7 @@
             app:chipBackgroundColor="@color/chip_bg_colors" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip5"
+            android:id="@+id/chip_government"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -62,7 +71,7 @@
             app:chipBackgroundColor="@color/chip_bg_colors" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip6"
+            android:id="@+id/chip_medical"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -71,7 +80,7 @@
             app:chipBackgroundColor="@color/chip_bg_colors" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip7"
+            android:id="@+id/chip_religion"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -80,7 +89,16 @@
             app:chipBackgroundColor="@color/chip_bg_colors" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip8"
+            android:id="@+id/chip_services"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Services"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:chipBackgroundColor="@color/chip_bg_colors" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_shops"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -89,7 +107,7 @@
             app:chipBackgroundColor="@color/chip_bg_colors" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip9"
+            android:id="@+id/chip_transportation"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
