@@ -9,6 +9,9 @@ The program is written in Java using Android Studio. You can find some video dem
 # Installation
 To try this application, download [**map-app.apk**](map-app.apk) in this repo, and transfer it to your device's storage. Then open up the .apk file inside your device to install. Make sure to give the application relevant permissions for it to run properly.
 
+# Location Permission
+Since this is an map application, your location is required for the application to function properly.
+
 # Video Demonstrations
 ## Overall
 <img src="https://user-images.githubusercontent.com/54968551/117927067-ae73e900-b2c7-11eb-9ec4-9ce455b9285e.gif" width="300" height="500"/>
