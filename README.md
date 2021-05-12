@@ -7,7 +7,7 @@ Users can create profiles that will be able to filter the types of places the ap
 The program is written in Java using Android Studio. You can find some video demonstrations below.
 
 # Installation
-To try this application, down the .apk package in this repo, and transfer it to your device's storage. Then open up the .apk file inside your device to install. Make sure to give the application relevant permissions for it to run properly.
+To try this application, download [**map-app.apk**](map-app.apk) in this repo, and transfer it to your device's storage. Then open up the .apk file inside your device to install. Make sure to give the application relevant permissions for it to run properly.
 
 # Video Demonstrations
 ## Overall
