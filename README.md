@@ -7,10 +7,11 @@ Users can create profiles that will be able to filter the types of places the ap
 The program is written in Java using Android Studio. You can find some video demonstrations below.
 
 # Installation
-To try this application, download [**map-app.apk**](map-app.apk) in this repo, and transfer it to your device's storage. Then open up the .apk file inside your device to install. Make sure to give the application relevant permissions for it to run properly.
+To try this application, download [**map-app.apk**](map-app.apk) in this repo, and transfer it to your device's storage. Then open up the .apk file inside your device to install. Make sure to give the application relevant permissions for it to run properly.<br>
+##### Notice: There is a quota set for this application regarding Google Maps API usage. If you receive an error similar to OVER_QUERRY_LIMIT, please try again later. Sorry for any inconvenience.
 
-# Location Permission
-Since this is an map application, your location is required for the application to function properly.
+# Location Permission & Usage
+Since this is an map application, your location is required for the application to function properly. All location data is strictly used for the application to function, and they are not stored anywhere.
 
 # Video Demonstrations
 ## Overall
